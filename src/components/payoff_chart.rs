@@ -1,6 +1,7 @@
 use dioxus::prelude::*;
 use crate::models::Position;
 use crate::engine::{PayoffEngine, PayoffPoint};
+use web_sys;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ChartEngine {
@@ -64,12 +65,47 @@ pub struct PayoffChartProps {
 
 pub fn PayoffChart(props: PayoffChartProps) -> Element {
     // Chart engine selection state (like Binance's chart selector)
-    let mut selected_engine = use_signal(|| ChartEngine::SvgNative);
+    let selected_engine = use_signal(|| ChartEngine::SvgNative);
     
-    // Interactive legend dragging state
-    let mut legend_position = use_signal(|| (500.0, 50.0)); // Default position (moved left for larger legend)
+    // Binance-style legend state (show on long press/hold)
+    let mut legend_visible = use_signal(|| false);
+    let mut legend_position = use_signal(|| (40.0, 20.0)); // Adjusted for larger Binance mobile popup
     let mut is_dragging = use_signal(|| false);
     let mut drag_offset = use_signal(|| (0.0, 0.0));
+    
+    // Mobile detection using effect to check CSS media query and touch capability
+    let mut is_mobile = use_signal(|| false);
+    
+    // Check if mobile on component mount
+    use_effect(move || {
+        // More accurate mobile detection combining width and touch capability
+        let window = web_sys::window().unwrap();
+        
+        // Check screen width
+        let width_mobile = window
+            .inner_width().ok()
+            .and_then(|w| w.as_f64())
+            .map(|width| width <= 480.0) // More conservative mobile threshold
+            .unwrap_or(false);
+            
+        // Check if device has touch capability
+        let touch_mobile = window
+            .navigator()
+            .max_touch_points() > 0;
+            
+        // Check user agent for mobile indicators
+        let ua_mobile = window
+            .navigator()
+            .user_agent()
+            .map(|ua| ua.to_lowercase().contains("mobile") || 
+                     ua.to_lowercase().contains("android") ||
+                     ua.to_lowercase().contains("iphone"))
+            .unwrap_or(false);
+            
+        // Device is mobile if it meets width criteria AND has touch OR is detected via user agent
+        let mobile = (width_mobile && touch_mobile) || ua_mobile;
+        is_mobile.set(mobile);
+    });
     
     // Hover data state for legend display
     let mut hover_data = use_signal(|| None::<(f64, f64, f64)>); // price, pnl, percent
@@ -397,7 +433,7 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                                                             circle {
                                                                                 cx: "{x}",
                                                                                 cy: "{y}",
-                                                                                r: "5",
+                                                                                r: "6", // Slightly larger for better interaction
                                                                                 fill: if point.payoff >= 0.0 { "#28a745" } else { "#dc3545" },
                                                                                 stroke: "#ffffff",
                                                                                 stroke_width: "2",
@@ -405,14 +441,72 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                                                                 class: "chart-point",
                                                                                 style: "cursor: pointer; transition: all 0.2s ease;",
                                                                                 
-                                                                                // Enhanced hover effects with legend update
-                                                                                onmouseenter: move |_| {
+                                                                                // Binance-style long press interaction
+                                                                                onmousedown: move |evt| {
+                                                                                    evt.prevent_default();
+                                                                                    evt.stop_propagation(); // Prevent event bubbling
                                                                                     let data = (price, payoff, percent_change);
                                                                                     hover_data.set(Some(data));
                                                                                     last_hover_data.set(data);
+                                                                                    
+                                                                                    // Set legend position near the clicked point (only for desktop)
+                                                                                    if !is_mobile() {
+                                                                                        let mouse_pos = evt.client_coordinates();
+                                                                                        // Adjust position to keep legend within bounds
+                                                                                        let x = (mouse_pos.x as f64 + 20.0).min(520.0); // Keep within SVG bounds
+                                                                                        let y = (mouse_pos.y as f64 - 100.0).max(50.0);
+                                                                                        legend_position.set((x, y));
+                                                                                        legend_visible.set(true);
+                                                                                    }
                                                                                 },
+                                                                                
+                                                                                // Touch events for mobile
+                                                                                ontouchstart: move |evt| {
+                                                                                    if is_mobile() {
+                                                                                        evt.prevent_default();
+                                                                                        let data = (price, payoff, percent_change);
+                                                                                        hover_data.set(Some(data));
+                                                                                        last_hover_data.set(data);
+                                                                                        
+                                                                                        // Center mobile popup (Binance-style)
+                                                                                        legend_position.set((40.0, 20.0));
+                                                                                        legend_visible.set(true);
+                                                                                    }
+                                                                                },
+                                                                                
+                                                                                onclick: move |evt| {
+                                                                                    if is_mobile() {
+                                                                                        evt.prevent_default();
+                                                                                        evt.stop_propagation();
+                                                                                        let data = (price, payoff, percent_change);
+                                                                                        hover_data.set(Some(data));
+                                                                                        last_hover_data.set(data);
+                                                                                        
+                                                                                        // Center mobile popup (Binance-style)
+                                                                                        legend_position.set((40.0, 20.0));
+                                                                                        legend_visible.set(true);
+                                                                                    }
+                                                                                },
+                                                                                
+                                                                                onmouseup: move |_| {
+                                                                                    // Keep legend visible for a moment
+                                                                                },
+                                                                                
                                                                                 onmouseleave: move |_| {
-                                                                                    hover_data.set(None);
+                                                                                    // Hide legend when leaving dot (desktop only)
+                                                                                    if !is_mobile() {
+                                                                                        hover_data.set(None);
+                                                                                        legend_visible.set(false);
+                                                                                    }
+                                                                                },
+                                                                                
+                                                                                // Quick hover feedback (without showing legend for desktop)
+                                                                                onmouseenter: move |_| {
+                                                                                    if !is_mobile() {
+                                                                                        let data = (price, payoff, percent_change);
+                                                                                        hover_data.set(Some(data));
+                                                                                        last_hover_data.set(data);
+                                                                                    }
                                                                                 }
                                                                             }
                                                                         }
@@ -559,116 +653,292 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                             "Options Portfolio Payoff Diagram"
                                         }
                                         
-                                        // Interactive legend with hover data display (draggable)
-                                        g {
-                                            transform: "translate({legend_position().0}, {legend_position().1})",
-                                            class: "draggable-legend",
-                                            style: "cursor: move;",
-                                            
-                                            // Legend background (expanded to show data)
+                                        // Interactive legend with hover data display (desktop) or mobile legend
+                                        if is_mobile() && legend_visible() {
+                                            // Mobile overlay to catch clicks outside popup
                                             rect {
-                                                x: "0", y: "0", width: "180", height: "120",
-                                                fill: "rgba(255, 255, 255, 0.95)",
-                                                stroke: "#dee2e6",
-                                                stroke_width: "1",
-                                                rx: "4",
-                                                style: "filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));",
+                                                x: "0", y: "0", width: "800", height: "400",
+                                                fill: "rgba(0, 0, 0, 0.3)", // Semi-transparent overlay
+                                                style: "cursor: pointer;",
+                                                onclick: move |_| {
+                                                    // Close popup when clicking outside
+                                                    legend_visible.set(false);
+                                                }
+                                            }
+                                            
+                                            // Mobile Binance-style legend (larger scale)
+                                            g {
+                                                transform: "translate({legend_position().0}, {legend_position().1})",
+                                                class: "mobile-legend",
+                                                style: "cursor: move;",
                                                 
-                                                // Drag events
+                                                // Mobile drag events
                                                 onmousedown: move |evt| {
                                                     is_dragging.set(true);
                                                     let rect = evt.client_coordinates();
                                                     let current_pos = legend_position();
                                                     drag_offset.set((rect.x as f64 - current_pos.0, rect.y as f64 - current_pos.1));
-                                                }
-                                            }
-                                            
-                                            // Legend title with drag handle indicator
-                                            text { 
-                                                x: "90", y: "12", 
-                                                text_anchor: "middle",
-                                                font_size: "10", 
-                                                font_weight: "bold",
-                                                fill: "#6c757d",
-                                                "📊 Interactive Legend (Drag Me)"
-                                            }
-                                            
-                                            // Chart legend items
-                                            line { x1: "10", y1: "25", x2: "30", y2: "25", stroke: "#007bff", stroke_width: "3" }
-                                            text { x: "35", y: "29", font_size: "9", fill: "#495057", "Payoff Curve" }
-                                            
-                                            line { x1: "10", y1: "38", x2: "30", y2: "38", stroke: "#ffc107", stroke_width: "3", stroke_dasharray: "4,2" }
-                                            text { x: "35", y: "42", font_size: "9", fill: "#495057", "Break Even" }
-                                            
-                                            circle { cx: "20", cy: "51", r: "3", fill: "#28a745" }
-                                            text { x: "35", y: "55", font_size: "9", fill: "#495057", "Profit Zone" }
-                                            
-                                            circle { cx: "20", cy: "64", r: "3", fill: "#dc3545" }
-                                            text { x: "35", y: "68", font_size: "9", fill: "#495057", "Loss Zone" }
-                                            
-                                            // Separator line
-                                            line { x1: "10", y1: "75", x2: "170", y2: "75", stroke: "#dee2e6", stroke_width: "1" }
-                                            
-                                            // Hover data display section
-                                            {
-                                                let display_data = if let Some(current_data) = hover_data() {
-                                                    current_data
-                                                } else {
-                                                    last_hover_data()
-                                                };
+                                                },
                                                 
-                                                let (price, payoff, percent) = display_data;
-                                                let status = if hover_data().is_some() { "LIVE" } else { "LAST" };
+                                                // Larger legend background for mobile (Binance-style size: 320x420px)
+                                                rect {
+                                                    x: "0", y: "0", width: "320", height: "420", // Binance-style mobile size
+                                                    fill: "rgba(30, 35, 41, 0.95)",
+                                                    stroke: "#F0B90B",
+                                                    stroke_width: "2",
+                                                    rx: "8",
+                                                    style: "filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.3));",
+                                                    
+                                                    // Double tap to close popup
+                                                    ondoubleclick: move |_| {
+                                                        legend_visible.set(false);
+                                                    },
+                                                    
+                                                    // Prevent closing when clicking inside popup
+                                                    onclick: move |evt| {
+                                                        evt.stop_propagation();
+                                                    }
+                                                }
                                                 
-                                                rsx! {
-                                                    // Data status indicator
-                                                    text { 
-                                                        x: "90", y: "88", 
-                                                        text_anchor: "middle",
-                                                        font_size: "8", 
-                                                        font_weight: "bold",
-                                                        fill: if hover_data().is_some() { "#28a745" } else { "#6c757d" },
-                                                        "{status} DATA"
-                                                    }
+                                                // Mobile title (proportional to Binance size)
+                                                text { 
+                                                    x: "160", y: "30", // Center of 320px width
+                                                    text_anchor: "middle",
+                                                    font_size: "18", // Larger for Binance-style
+                                                    font_weight: "bold",
+                                                    fill: "#F0B90B",
+                                                    "📊 Payoff Analysis"
+                                                }
+                                                
+                                                // Chart legend items (Binance-style mobile optimized)
+                                                line { x1: "20", y1: "55", x2: "45", y2: "55", stroke: "#02C076", stroke_width: "3" }
+                                                text { x: "50", y: "60", font_size: "14", fill: "#EAECEF", "Payoff Curve" }
+                                                
+                                                line { x1: "20", y1: "80", x2: "45", y2: "80", stroke: "#F0B90B", stroke_width: "3", stroke_dasharray: "4,2" }
+                                                text { x: "50", y: "85", font_size: "14", fill: "#EAECEF", "Break Even" }
+                                                
+                                                circle { cx: "32", cy: "105", r: "5", fill: "#02C076" }
+                                                text { x: "50", y: "110", font_size: "14", fill: "#EAECEF", "Profit Zone" }
+                                                
+                                                circle { cx: "32", cy: "130", r: "5", fill: "#F6465D" }
+                                                text { x: "50", y: "135", font_size: "14", fill: "#EAECEF", "Loss Zone" }
+                                                
+                                                // Separator line
+                                                line { x1: "20", y1: "155", x2: "300", y2: "155", stroke: "#474D57", stroke_width: "1" }
+                                                
+                                                // Real-time data display section (mobile optimized)
+                                                {
+                                                    let display_data = if let Some(current_data) = hover_data() {
+                                                        current_data
+                                                    } else {
+                                                        last_hover_data()
+                                                    };
                                                     
-                                                    // Price display
-                                                    text { 
-                                                        x: "10", y: "100", 
-                                                        font_size: "10", 
-                                                        font_weight: "bold",
-                                                        fill: "#212529",
-                                                        "Price: ${price:.2}"
-                                                    }
+                                                    let (price, payoff, percent) = display_data;
+                                                    let status = if hover_data().is_some() { "LIVE" } else { "LAST" };
                                                     
-                                                    // P&L display
-                                                    text { 
-                                                        x: "10", y: "112", 
-                                                        font_size: "10", 
-                                                        font_weight: "bold",
-                                                        fill: if payoff >= 0.0 { "#28a745" } else { "#dc3545" },
-                                                        "P&L: ${payoff:.2} ({percent:+.1}%)"
+                                                    rsx! {
+                                                        // Data status indicator (Binance mobile size)
+                                                        text { 
+                                                            x: "160", y: "180", 
+                                                            text_anchor: "middle",
+                                                            font_size: "13", 
+                                                            font_weight: "bold",
+                                                            fill: if hover_data().is_some() { "#02C076" } else { "#848E9C" },
+                                                            "● {status} DATA"
+                                                        }
+                                                        
+                                                        // Price, P&L in columns (Binance mobile optimized)
+                                                        text { 
+                                                            x: "20", y: "210", 
+                                                            font_size: "16", 
+                                                            font_weight: "bold",
+                                                            fill: "#EAECEF",
+                                                            "Price: ${price:.2}"
+                                                        }
+                                                        text { 
+                                                            x: "20", y: "240", 
+                                                            font_size: "16", 
+                                                            font_weight: "bold",
+                                                            fill: if payoff >= 0.0 { "#02C076" } else { "#F6465D" },
+                                                            "P&L: ${payoff:.2}"
+                                                        }
+                                                        text { 
+                                                            x: "20", y: "270", 
+                                                            font_size: "14", 
+                                                            font_weight: "bold",
+                                                            fill: if payoff >= 0.0 { "#02C076" } else { "#F6465D" },
+                                                            "({percent:+.1}%)"
+                                                        }
+                                                        
+                                                        // Additional Binance-style info
+                                                        line { x1: "20", y1: "290", x2: "300", y2: "290", stroke: "#474D57", stroke_width: "1" }
+                                                        
+                                                        text { 
+                                                            x: "20", y: "315", 
+                                                            font_size: "12", 
+                                                            fill: "#848E9C",
+                                                            "Portfolio Analysis"
+                                                        }
+                                                        text { 
+                                                            x: "20", y: "335", 
+                                                            font_size: "11", 
+                                                            fill: "#848E9C",
+                                                            "Tap outside or double-tap to close"
+                                                        }
+                                                        
+                                                        // Risk indicator
+                                                        {
+                                                            let risk_color = if payoff < -100.0 { "#F6465D" } 
+                                                                             else if payoff > 100.0 { "#02C076" } 
+                                                                             else { "#F0B90B" };
+                                                            let risk_text = if payoff < -100.0 { "HIGH RISK" } 
+                                                                           else if payoff > 100.0 { "HIGH PROFIT" } 
+                                                                           else { "MODERATE" };
+                                                            rsx! {
+                                                                text { 
+                                                                    x: "20", y: "365", 
+                                                                    font_size: "11", 
+                                                                    font_weight: "bold",
+                                                                    fill: risk_color,
+                                                                    "Risk Level: {risk_text}"
+                                                                }
+                                                            }
+                                                        }
                                                     }
                                                 }
-                                            }
-                                            
-                                            // Mini close button to minimize legend
-                                            circle {
-                                                cx: "170", cy: "10", r: "6",
-                                                fill: "#f8f9fa",
-                                                stroke: "#dee2e6",
-                                                style: "cursor: pointer;",
-                                                onclick: move |_| {
-                                                    // Move legend to corner when minimized
-                                                    legend_position.set((650.0, 50.0));
+                                                
+                                                // Close button (Binance mobile optimized)
+                                                circle {
+                                                    cx: "295", cy: "25", r: "15",
+                                                    fill: "#F6465D",
+                                                    style: "cursor: pointer;",
+                                                    onclick: move |_| {
+                                                        legend_visible.set(false);
+                                                    }
+                                                }
+                                                text {
+                                                    x: "295", y: "32",
+                                                    text_anchor: "middle",
+                                                    font_size: "18",
+                                                    fill: "white",
+                                                    font_weight: "bold",
+                                                    style: "cursor: pointer; user-select: none;",
+                                                    "×"
                                                 }
                                             }
-                                            text {
-                                                x: "170", y: "13",
-                                                text_anchor: "middle",
-                                                font_size: "8",
-                                                fill: "#6c757d",
-                                                style: "cursor: pointer; user-select: none;",
-                                                "×"
+                                        } else if legend_visible() {
+                                            // Desktop legend (original size) - only show when legend_visible is true
+                                            g {
+                                                transform: "translate({legend_position().0}, {legend_position().1})",
+                                                class: "draggable-legend",
+                                                style: "cursor: move;",
+                                                
+                                                // Legend background (expanded to show data)
+                                                rect {
+                                                    x: "0", y: "0", width: "180", height: "120",
+                                                    fill: "rgba(255, 255, 255, 0.95)",
+                                                    stroke: "#dee2e6",
+                                                    stroke_width: "1",
+                                                    rx: "4",
+                                                    style: "filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));",
+                                                    
+                                                    // Drag events
+                                                    onmousedown: move |evt| {
+                                                        is_dragging.set(true);
+                                                        let rect = evt.client_coordinates();
+                                                        let current_pos = legend_position();
+                                                        drag_offset.set((rect.x as f64 - current_pos.0, rect.y as f64 - current_pos.1));
+                                                    }
+                                                }
+                                                
+                                                // Legend title with drag handle indicator
+                                                text { 
+                                                    x: "90", y: "12", 
+                                                    text_anchor: "middle",
+                                                    font_size: "10", 
+                                                    font_weight: "bold",
+                                                    fill: "#6c757d",
+                                                    "📊 Interactive Legend (Drag Me)"
+                                                }
+                                                
+                                                // Chart legend items
+                                                line { x1: "10", y1: "25", x2: "30", y2: "25", stroke: "#007bff", stroke_width: "3" }
+                                                text { x: "35", y: "29", font_size: "9", fill: "#495057", "Payoff Curve" }
+                                                
+                                                line { x1: "10", y1: "38", x2: "30", y2: "38", stroke: "#ffc107", stroke_width: "3", stroke_dasharray: "4,2" }
+                                                text { x: "35", y: "42", font_size: "9", fill: "#495057", "Break Even" }
+                                                
+                                                circle { cx: "20", cy: "51", r: "3", fill: "#28a745" }
+                                                text { x: "35", y: "55", font_size: "9", fill: "#495057", "Profit Zone" }
+                                                
+                                                circle { cx: "20", cy: "64", r: "3", fill: "#dc3545" }
+                                                text { x: "35", y: "68", font_size: "9", fill: "#495057", "Loss Zone" }
+                                                
+                                                // Separator line
+                                                line { x1: "10", y1: "75", x2: "170", y2: "75", stroke: "#dee2e6", stroke_width: "1" }
+                                                
+                                                // Hover data display section
+                                                {
+                                                    let display_data = if let Some(current_data) = hover_data() {
+                                                        current_data
+                                                    } else {
+                                                        last_hover_data()
+                                                    };
+                                                    
+                                                    let (price, payoff, percent) = display_data;
+                                                    let status = if hover_data().is_some() { "LIVE" } else { "LAST" };
+                                                    
+                                                    rsx! {
+                                                        // Data status indicator
+                                                        text { 
+                                                            x: "90", y: "88", 
+                                                            text_anchor: "middle",
+                                                            font_size: "8", 
+                                                            font_weight: "bold",
+                                                            fill: if hover_data().is_some() { "#28a745" } else { "#6c757d" },
+                                                            "{status} DATA"
+                                                        }
+                                                        
+                                                        // Price display
+                                                        text { 
+                                                            x: "10", y: "100", 
+                                                            font_size: "10", 
+                                                            font_weight: "bold",
+                                                            fill: "#212529",
+                                                            "Price: ${price:.2}"
+                                                        }
+                                                        
+                                                        // P&L display
+                                                        text { 
+                                                            x: "10", y: "112", 
+                                                            font_size: "10", 
+                                                            font_weight: "bold",
+                                                            fill: if payoff >= 0.0 { "#28a745" } else { "#dc3545" },
+                                                            "P&L: ${payoff:.2} ({percent:+.1}%)"
+                                                        }
+                                                    }
+                                                }
+                                                
+                                                // Mini close button to minimize legend
+                                                circle {
+                                                    cx: "170", cy: "10", r: "6",
+                                                    fill: "#f8f9fa",
+                                                    stroke: "#dee2e6",
+                                                    style: "cursor: pointer;",
+                                                    onclick: move |_| {
+                                                        // Move legend to corner when minimized
+                                                        legend_position.set((650.0, 50.0));
+                                                    }
+                                                }
+                                                text {
+                                                    x: "170", y: "13",
+                                                    text_anchor: "middle",
+                                                    font_size: "8",
+                                                    fill: "#6c757d",
+                                                    style: "cursor: pointer; user-select: none;",
+                                                    "×"
+                                                }
                                             }
                                         }
                                         

@@ -5,27 +5,35 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased] - 2025-09-14
 
 ### Added
-- **Interactive Chart Legend**: Draggable legend with real-time hover data display
-- **Hover Data Integration**: Live price, P&L, and percentage data shown in legend instead of popup tooltips
-- **LIVE/LAST Data Indicators**: Visual status indicators for current vs. last hovered data
-- **Improved Chart Responsiveness**: Better SVG scaling and positioning
-- **Smooth Animations**: Optimized CSS animations for chart interactions (0.08s timing)
+- **Binance-Style Legend**: Long-press activation legend with professional dark theme
+- **Chart Render Area Fix**: Proper vertical expansion to accommodate chart and statistics
+- **Interactive Data Points**: Larger dots (6px) with enhanced hover effects
+- **Real-time Data Display**: Price, P&L, and percentage data with color coding
+- **Professional Styling**: Dark theme with Binance-inspired colors (#F0B90B yellow, #02C076 green, #F6465D red)
 
 ### Changed
-- **Removed Popup Tooltips**: Eliminated floating tooltip popups that caused flickering
-- **Enhanced Legend Size**: Expanded from 140x80 to 180x120 to accommodate data display
-- **Legend Position**: Adjusted default position for better chart visibility
-- **Data Display Logic**: Hover data now persists as "LAST DATA" when not actively hovering
+- **Legend Activation**: Changed from always-visible to click-and-hold activation (like Binance)
+- **Legend Size**: Increased to 240x160 for better data readability
+- **Chart Layout**: Fixed chart-render-area flexbox behavior for proper content expansion
+- **Color Scheme**: Updated to professional trading platform colors
+- **Interaction Model**: Simplified to click-to-show instead of complex hover states
 
 ### Fixed
-- **Tooltip Flickering**: Completely resolved popup flickering issues
-- **Mouse Event Handling**: Simplified hover interactions to prevent state conflicts
-- **Legend Dragging**: Improved drag behavior and boundary constraints
+- **Chart Vertical Expansion**: Chart now properly expands to fit content and statistics
+- **Legend Positioning**: Better automatic positioning near clicked points
+- **Chart Point Interaction**: Improved click detection with larger interactive areas
 
 ### Technical Improvements
-- **State Management**: Replaced tooltip state with hover data state for better performance
-- **CSS Optimization**: Added `will-change` property for better rendering performance
-- **Event Handling**: Streamlined mouse events to reduce re-renders
+- **Simplified State Management**: Removed complex timer logic for cleaner interaction
+- **CSS Flexbox**: Added proper flex properties for chart-render-area
+- **Event Handling**: Streamlined click events for legend activation
+- **Performance**: Reduced DOM manipulation for better responsiveness
+
+### Previous Features (Still Active)
+- **Interactive Chart Legend**: Draggable legend with real-time hover data display
+- **Hover Data Integration**: Live price, P&L, and percentage data shown in legend
+- **LIVE/LAST Data Indicators**: Visual status indicators for current vs. last data
+- **Mobile Responsive Design**: Vertical stacking on mobile devices
 
 ## [Previous] - 2025-09-13
 

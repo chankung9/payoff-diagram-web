@@ -64,13 +64,13 @@ pub fn App() -> Element {
             main {
                 class: "app-main",
                 
-                // Chart and Position Form - Side by Side
+                // Chart and Position Form - Side by Side on Desktop, Stacked on Mobile
                 div {
-                    class: "chart-and-form-section",
+                    class: "chart-and-form-section responsive-layout",
                     
-                    // Chart Section - 9/12 width
+                    // Chart Section - 9/12 width on desktop, full width on mobile (order: 1)
                     div {
-                        class: "section chart-section-side",
+                        class: "section chart-section-side mobile-order-1",
                         PayoffChart {
                             positions: positions.read().clone(),
                             price_start: price_start(),
@@ -79,9 +79,9 @@ pub fn App() -> Element {
                         }
                     }
                     
-                    // Position Form - 3/12 width
+                    // Position Form - 3/12 width on desktop, full width on mobile (order: 2)
                     div {
-                        class: "section position-form-side",
+                        class: "section position-form-side mobile-order-2",
                         PositionForm {
                             on_add_position: move |position: Position| {
                                 positions.write().push(position);
@@ -90,9 +90,9 @@ pub fn App() -> Element {
                     }
                 }
                 
-                // Position List and Chart Controls - Grid Layout Below
+                // Position List and Chart Controls - Grid Layout Below (order: 3 on mobile)
                 div {
-                    class: "app-grid-bottom",
+                    class: "app-grid-bottom mobile-order-3",
                     
                     // Left Column: Position List Only
                     div {

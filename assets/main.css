@@ -82,6 +82,12 @@
         max-height: 350px;
         aspect-ratio: 1.6/1;
     }
+    
+    /* Binance-style mobile legend */
+    .mobile-legend {
+        --mobile-legend-width: 320px;
+        --mobile-legend-height: 420px;
+    }
 }
 
 /* Chart Engine Selector */
@@ -444,10 +450,10 @@ body {
     gap: 2rem;
 }
 
-/* Chart and Form Section - Side by Side (9:3 ratio) */
+/* Chart and Form Section - Side by Side (3:1 ratio) */
 .chart-and-form-section {
     display: grid;
-    grid-template-columns: 3fr 1fr; /* 9:3 ratio (3:1) */
+    grid-template-columns: 3fr 1fr; /* 3:1 ratio */
     gap: 2rem;
     margin-bottom: 2rem;
     min-height: 500px;
@@ -969,6 +975,75 @@ body {
     gap: 1rem;
 }
 
+/* Chart Render Area - Fix vertical expansion */
+.chart-render-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+    height: auto;
+}
+
+/* Binance-style legend styling */
+.binance-legend {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.binance-legend:hover {
+    transform: scale(1.02);
+}
+
+/* Mobile responsive legend - optimized 210x315 size for mobile */
+@media (max-width: 768px) {
+    .legend-background {
+        width: 210 !important; 
+        height: 315 !important; 
+    }
+    
+    /* Define CSS custom properties for mobile scaling */
+    .binance-legend {
+        --mobile-scale: 1.0;
+        --legend-width: 210px;
+        --legend-height: 315px;
+        --close-btn-x: 190;
+        --close-btn-y: 20;
+        --close-btn-r: 12;
+        --title-x: 105;
+        --title-y: 25;
+        --title-size: 16px;
+        --text-scale: 1.0;
+    }
+    
+    /* Scale up text size */
+    .binance-legend text {
+        font-size: calc(var(--text-scale, 1) * 1em) !important;
+    }
+    
+    /* Adjust legend positioning for mobile - center it better */
+    .binance-legend {
+        transform-origin: center center;
+        /* Add padding to prevent text overflow */
+        padding: 5px;
+        box-sizing: border-box;
+    }
+    
+    /* Make background auto-expand for content */
+    .legend-background {
+        min-width: 210px !important;
+        min-height: 315px !important;
+        width: auto !important;
+        height: auto !important;
+    }
+}
+
+/* Chart point hover effects */
+.chart-point:hover {
+    r: 8;
+    opacity: 1;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+}
+
 .stat-item.profit .stat-value {
     color: #28a745;
 }
@@ -1141,14 +1216,60 @@ body {
         gap: 1.5rem;
     }
     
+    /* Mobile: Stack chart and form vertically with specific order */
+    .chart-and-form-section {
+        display: flex !important;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* Mobile: Chart shows first */
+    .mobile-order-1 {
+        order: 1;
+    }
+    
+    /* Mobile: Position form shows second */
+    .mobile-order-2 {
+        order: 2;
+    }
+    
+    /* Mobile: Position list and controls show last */
+    .mobile-order-3 {
+        order: 3;
+    }
+    
     /* Mobile: Chart section adjustments */
-    .chart-section-full {
+    .chart-section-side {
         padding: 1rem;
         min-height: 350px;
     }
     
+    .chart-section-side .payoff-chart-svg {
+        height: 320px;
+    }
+    
+    .chart-section-full {
+        padding: 1rem;
+        min-height: 350px;
+        order: 1; /* Chart shows first */
+    }
+    
     .chart-section-full .payoff-chart-svg {
         height: 320px;
+    }
+    
+    /* Mobile: Position form styling */
+    .position-form-side {
+        position: static; /* Remove sticky positioning on mobile */
+        margin-bottom: 1.5rem;
+        min-height: auto;
+    }
+    
+    /* Mobile: Bottom grid stacks vertically */
+    .app-grid-bottom {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
     
     .form-row {

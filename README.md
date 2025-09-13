@@ -188,6 +188,15 @@ payoff-diagram-web/
 - **Toggle Active/Inactive**: Use the checkbox in each position card to enable/disable positions without deletion
 - **Edit Positions**: Click the edit button to modify position details inline
 - **Remove Positions**: Click the remove button to permanently delete positions
+
+### Interactive Chart Features
+
+- **Binance-Style Legend**: Click and hold on any data point to display detailed analysis
+- **Real-time Data**: View price, P&L, and percentage change for each point
+- **Draggable Legend**: Move the legend around the chart for optimal viewing
+- **Professional Theme**: Dark theme with trading platform colors (Binance-inspired)
+- **Responsive Design**: Automatically adapts to mobile devices with vertical layout
+- **Chart Statistics**: View max profit, max loss, and breakeven points above the chart
 - **Clear All**: Use "Clear All" button to remove all positions at once
 
 ### Position Toggle Feature
