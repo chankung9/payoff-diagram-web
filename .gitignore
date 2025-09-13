@@ -1,7 +1,6 @@
 # Rust
 target/
 **/*.rs.bk
-Cargo.lock
 
 # WASM build output
 pkg/
@@ -94,5 +93,4 @@ wheels/
 *.egg
 
 # Testing
-/target/criterion/
-/target/debug/deps/test-*
+# Note: Cargo.lock should be committed for binary projects
