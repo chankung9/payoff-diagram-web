@@ -29,6 +29,7 @@ pub struct SpotPosition {
     pub quantity: f64,          // Number of units (positive = long, negative = short)
     pub entry_price: f64,       // Price at which position was entered
     pub description: String,    // Optional description
+    pub active: bool,           // Whether position is active (included in calculations)
 }
 
 /// Option position (Call or Put)
@@ -40,6 +41,7 @@ pub struct OptionPosition {
     pub premium: f64,               // Premium paid/received per contract
     pub expiry_price: f64,          // Current price at expiry (for calculation)
     pub description: String,        // Optional description
+    pub active: bool,               // Whether position is active (included in calculations)
 }
 
 /// Futures position
@@ -49,6 +51,7 @@ pub struct FuturesPosition {
     pub entry_price: f64,       // Price at which futures was entered
     pub contract_size: f64,     // Size of each contract (multiplier)
     pub description: String,    // Optional description
+    pub active: bool,           // Whether position is active (included in calculations)
 }
 
 impl Position {
@@ -78,6 +81,33 @@ impl Position {
             Position::Futures(pos) => pos.quantity,
         }
     }
+
+    /// Check if position is active
+    pub fn is_active(&self) -> bool {
+        match self {
+            Position::Spot(pos) => pos.active,
+            Position::Option(pos) => pos.active,
+            Position::Futures(pos) => pos.active,
+        }
+    }
+
+    /// Toggle position active state
+    pub fn toggle_active(&mut self) {
+        match self {
+            Position::Spot(ref mut pos) => pos.active = !pos.active,
+            Position::Option(ref mut pos) => pos.active = !pos.active,
+            Position::Futures(ref mut pos) => pos.active = !pos.active,
+        }
+    }
+
+    /// Set position active state
+    pub fn set_active(&mut self, active: bool) {
+        match self {
+            Position::Spot(ref mut pos) => pos.active = active,
+            Position::Option(ref mut pos) => pos.active = active,
+            Position::Futures(ref mut pos) => pos.active = active,
+        }
+    }
 }
 
 impl SpotPosition {
@@ -89,6 +119,7 @@ impl SpotPosition {
                 let direction = if quantity >= 0.0 { "Long" } else { "Short" };
                 format!("{} {} units @ {}", direction, quantity.abs(), entry_price)
             }),
+            active: true,  // Default to active
         }
     }
 }
@@ -116,6 +147,7 @@ impl OptionPosition {
                 format!("{} {} {} @ Strike {} Premium {}", 
                     direction, quantity.abs(), opt_type, strike_price, premium)
             }),
+            active: true,  // Default to active
         }
     }
 }
@@ -136,6 +168,7 @@ impl FuturesPosition {
                 format!("{} {} Futures @ {} (Size: {})", 
                     direction, quantity.abs(), entry_price, contract_size)
             }),
+            active: true,  // Default to active
         }
     }
 }

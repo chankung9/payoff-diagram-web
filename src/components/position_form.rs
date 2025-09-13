@@ -6,8 +6,16 @@ pub struct PositionFormProps {
     pub on_add_position: EventHandler<Position>,
 }
 
+/// Position direction (Long or Short)
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PositionDirection {
+    Long,
+    Short,
+}
+
 pub fn PositionForm(props: PositionFormProps) -> Element {
     let mut position_type = use_signal(|| PositionType::Spot);
+    let mut position_direction = use_signal(|| PositionDirection::Long);
     let mut quantity = use_signal(|| String::new());
     let mut entry_price = use_signal(|| String::new());
     let mut strike_price = use_signal(|| String::new());
@@ -18,6 +26,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
     let mut error_message = use_signal(|| String::new());
 
     let mut reset_form = move || {
+        position_direction.set(PositionDirection::Long);
         quantity.set(String::new());
         entry_price.set(String::new());
         strike_price.set(String::new());
@@ -31,12 +40,18 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
         error_message.set(String::new());
         
         // Parse and validate inputs
-        let qty = match quantity().parse::<f64>() {
-            Ok(q) if q != 0.0 => q,
+        let base_qty = match quantity().parse::<f64>() {
+            Ok(q) if q > 0.0 => q,
             _ => {
-                error_message.set("Quantity must be a non-zero number".to_string());
+                error_message.set("Quantity must be a positive number".to_string());
                 return;
             }
+        };
+
+        // Apply direction (Long = positive, Short = negative)
+        let qty = match position_direction() {
+            PositionDirection::Long => base_qty,
+            PositionDirection::Short => -base_qty,
         };
 
         let position = match position_type() {
@@ -144,13 +159,33 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                     
                     div {
                         class: "form-group",
+                        label { r#for: "position-direction", "Direction" }
+                        select {
+                            id: "position-direction",
+                            class: "form-control",
+                            value: "{position_direction():?}",
+                            onchange: move |e| {
+                                match e.value().as_str() {
+                                    "Long" => position_direction.set(PositionDirection::Long),
+                                    "Short" => position_direction.set(PositionDirection::Short),
+                                    _ => {}
+                                }
+                            },
+                            option { value: "Long", "Long" }
+                            option { value: "Short", "Short" }
+                        }
+                    }
+                    
+                    div {
+                        class: "form-group",
                         label { r#for: "quantity", "Quantity" }
                         input {
                             id: "quantity",
                             class: "form-control",
                             r#type: "number",
                             step: "any",
-                            placeholder: "e.g., 100 (positive = long, negative = short)",
+                            min: "0.01",
+                            placeholder: "e.g., 100",
                             value: "{quantity()}",
                             oninput: move |e| quantity.set(e.value())
                         }

@@ -24,6 +24,7 @@ impl PayoffEngine {
     pub fn calculate_portfolio_payoff(positions: &[Position], underlying_price: f64) -> f64 {
         positions
             .iter()
+            .filter(|pos| pos.is_active())  // Only include active positions
             .map(|pos| Self::calculate_single_payoff(pos, underlying_price))
             .sum()
     }
@@ -50,15 +51,19 @@ impl PayoffEngine {
         points
     }
 
-    /// Find break-even points for a portfolio
+    /// Find breakeven points for the portfolio
     pub fn find_breakeven_points(
-        positions: &[Position],
-        price_start: f64,
-        price_end: f64,
-        precision: f64,
+        positions: &[Position], 
+        price_start: f64, 
+        price_end: f64, 
+        step_size: f64
     ) -> Vec<f64> {
+        let active_positions: Vec<&Position> = positions.iter().filter(|pos| pos.is_active()).collect();
+        if active_positions.is_empty() {
+            return Vec::new();
+        }
+        
         let mut breakeven_points = Vec::new();
-        let step_size = precision;
         let mut prev_pnl = Self::calculate_portfolio_payoff(positions, price_start);
         let mut current_price = price_start + step_size;
 
@@ -91,8 +96,20 @@ impl PayoffEngine {
         price_end: f64,
         step_size: f64,
     ) -> Option<f64> {
+        let active_positions: Vec<&Position> = positions.iter().filter(|pos| pos.is_active()).collect();
+        if active_positions.is_empty() {
+            return None;
+        }
+        
         let points = Self::generate_payoff_curve(positions, price_start, price_end, step_size);
-        points.iter().map(|p| p.payoff).max_by(|a, b| a.partial_cmp(b).unwrap())
+        let max_profit = points.iter().map(|p| p.payoff).max_by(|a, b| a.partial_cmp(b).unwrap());
+        
+        #[cfg(debug_assertions)]
+        if let Some(max) = max_profit {
+            web_sys::console::log_1(&format!("Max Profit calculated: ${:.2}", max).into());
+        }
+        
+        max_profit
     }
 
     /// Calculate maximum loss for a portfolio (if bounded)
@@ -102,8 +119,20 @@ impl PayoffEngine {
         price_end: f64,
         step_size: f64,
     ) -> Option<f64> {
+        let active_positions: Vec<&Position> = positions.iter().filter(|pos| pos.is_active()).collect();
+        if active_positions.is_empty() {
+            return None;
+        }
+        
         let points = Self::generate_payoff_curve(positions, price_start, price_end, step_size);
-        points.iter().map(|p| p.payoff).min_by(|a, b| a.partial_cmp(b).unwrap())
+        let max_loss = points.iter().map(|p| p.payoff).min_by(|a, b| a.partial_cmp(b).unwrap());
+        
+        #[cfg(debug_assertions)]
+        if let Some(min) = max_loss {
+            web_sys::console::log_1(&format!("Max Loss calculated: ${:.2}", min).into());
+        }
+        
+        max_loss
     }
 
     // === Private helper functions ===
@@ -121,18 +150,22 @@ impl PayoffEngine {
             OptionType::Put => (option.strike_price - underlying_price).max(0.0),
         };
 
-        // For long positions: P&L = Quantity * (Intrinsic Value - Premium)
-        // For short positions: P&L = Quantity * (Premium - Intrinsic Value) 
-        // Note: quantity can be negative for short positions
-        let net_payoff = if option.quantity >= 0.0 {
-            // Long position: pay premium, receive intrinsic value
-            intrinsic_value - option.premium
-        } else {
-            // Short position: receive premium, pay intrinsic value
-            option.premium - intrinsic_value
-        };
-
-        option.quantity.abs() * net_payoff * if option.quantity >= 0.0 { 1.0 } else { -1.0 }
+        // Calculate payoff per contract (always from long perspective first)
+        let long_payoff_per_contract = intrinsic_value - option.premium;
+        
+        // Apply quantity (negative quantity automatically makes it short)
+        let total_payoff = option.quantity * long_payoff_per_contract;
+        
+        // Debug logging for troubleshooting
+        #[cfg(debug_assertions)]
+        if underlying_price == 200.0 || underlying_price == 0.0 || underlying_price == 250.0 {
+            web_sys::console::log_1(&format!(
+                "Option Debug - Underlying: ${:.2}, Intrinsic: ${:.2}, Long P&L: ${:.2}, Quantity: {}, Total: ${:.2}",
+                underlying_price, intrinsic_value, long_payoff_per_contract, option.quantity, total_payoff
+            ).into());
+        }
+        
+        total_payoff
     }
 
     /// Calculate futures position payoff

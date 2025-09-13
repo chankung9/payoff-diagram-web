@@ -4,8 +4,52 @@ use crate::components::{PositionForm, PositionList, ChartControls, PayoffChart};
 
 pub fn App() -> Element {
     let mut positions = use_signal(|| Vec::<Position>::new());
-    let mut price_start = use_signal(|| 50.0);
-    let mut price_end = use_signal(|| 150.0);
+    let mut price_start = use_signal(|| 0.0);    
+    let mut price_end = use_signal(|| 300.0);   
+
+    // Auto-adjust price range based on positions
+    let auto_range = use_memo(move || {
+        if positions().is_empty() {
+            return (0.0, 300.0);
+        }
+        
+        let mut min_relevant = f64::INFINITY;
+        let mut max_relevant = f64::NEG_INFINITY;
+        
+        for position in positions() {
+            match position {
+                Position::Option(ref option) => {
+                    // Extend range around strike price
+                    let range_padding = option.strike_price * 0.5; // 50% padding
+                    min_relevant = min_relevant.min(option.strike_price - range_padding);
+                    max_relevant = max_relevant.max(option.strike_price + range_padding);
+                }
+                Position::Spot(ref spot) => {
+                    let range_padding = spot.entry_price * 0.3; // 30% padding
+                    min_relevant = min_relevant.min(spot.entry_price - range_padding);
+                    max_relevant = max_relevant.max(spot.entry_price + range_padding);
+                }
+                Position::Futures(ref futures) => {
+                    let range_padding = futures.entry_price * 0.3; // 30% padding
+                    min_relevant = min_relevant.min(futures.entry_price - range_padding);
+                    max_relevant = max_relevant.max(futures.entry_price + range_padding);
+                }
+            }
+        }
+        
+        // Ensure minimum range and floor at 0
+        let start = (min_relevant.max(0.0)).max(0.0);
+        let end = max_relevant.max(start + 100.0);
+        
+        (start, end)
+    });
+
+    // Update price range when positions change
+    use_effect(move || {
+        let (start, end) = auto_range();
+        price_start.set(start);
+        price_end.set(end);
+    });
     let mut step_size = use_signal(|| 1.0);
 
     rsx! {
@@ -48,6 +92,11 @@ pub fn App() -> Element {
                                 on_update_position: move |(index, updated_position): (usize, Position)| {
                                     if index < positions.read().len() {
                                         positions.write()[index] = updated_position;
+                                    }
+                                },
+                                on_toggle_position: move |index: usize| {
+                                    if index < positions.read().len() {
+                                        positions.write()[index].toggle_active();
                                     }
                                 },
                                 on_clear_all: move |_| {

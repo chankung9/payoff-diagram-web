@@ -48,6 +48,85 @@
     color: #6c757d;
 }
 
+/* Position Direction Indicators */
+.position-direction {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+.position-direction.long {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.position-direction.short {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Position Toggle Controls */
+.position-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: auto;
+}
+
+.position-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #28a745;
+}
+
+.position-checkbox-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #495057;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Disabled Position Styling */
+.position-card:not(.editing) {
+    transition: all 0.3s ease;
+}
+
+.position-card[data-active="false"] {
+    opacity: 0.6;
+    background-color: #f8f9fa !important;
+    border-color: #dee2e6 !important;
+}
+
+.position-card[data-active="false"] .position-info {
+    color: #6c757d;
+}
+
+.position-card[data-active="false"] .position-direction {
+    opacity: 0.7;
+}
+
+.position-card[data-active="false"] .position-type-badge {
+    background-color: #6c757d !important;
+    color: white;
+}
+
+/* Position Card Header Layout */
+.position-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e9ecef;
+    background: rgba(255, 255, 255, 0.5);
+}
+
 /* SVG Chart Styles */
 .svg-chart-container {
     background: #ffffff;
