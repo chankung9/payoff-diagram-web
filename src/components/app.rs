@@ -45,6 +45,11 @@ pub fn App() -> Element {
                                         positions.write().remove(index);
                                     }
                                 },
+                                on_update_position: move |(index, updated_position): (usize, Position)| {
+                                    if index < positions.read().len() {
+                                        positions.write()[index] = updated_position;
+                                    }
+                                },
                                 on_clear_all: move |_| {
                                     positions.write().clear();
                                 }

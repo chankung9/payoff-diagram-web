@@ -1,3 +1,208 @@
+/* Chart Engine Selector */
+.chart-engine-selector {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chart-engine-selector h3 {
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 1.3rem;
+}
+
+.engine-dropdown {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.engine-dropdown select {
+    padding: 0.75rem;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.engine-dropdown select:hover {
+    border-color: #007bff;
+}
+
+.engine-dropdown select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.engine-info {
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    color: #6c757d;
+}
+
+/* SVG Chart Styles */
+.svg-chart-container {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.svg-chart-container h4 {
+    margin-bottom: 1rem;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.svg-chart-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.payoff-chart-svg {
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Interactive chart elements */
+.chart-point:hover {
+    r: 7 !important;
+    opacity: 1 !important;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.grid line {
+    shape-rendering: crispEdges;
+}
+
+/* Chart info panel */
+.chart-info-panel {
+    width: 100%;
+    max-width: 800px;
+}
+
+.chart-info-panel strong {
+    display: block;
+    font-size: 1rem;
+    color: #495057;
+    margin-bottom: 0.5rem;
+}
+
+/* Chart empty state */
+.chart-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+.chart-empty-state p {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+
+.feature-preview {
+    max-width: 400px;
+    margin: 0 auto;
+    text-align: left;
+}
+
+.feature-preview h5 {
+    color: #495057;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.feature-preview ul {
+    list-style: none;
+    padding: 0;
+}
+
+.feature-preview li {
+    padding: 0.5rem 0;
+    color: #6c757d;
+    font-size: 0.95rem;
+}
+
+/* Coming soon styles */
+.chart-coming-soon {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #dee2e6;
+}
+
+.chart-coming-soon h4 {
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.chart-coming-soon p {
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+}
+
+.coming-soon-notice {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+    padding: 1rem;
+    color: #856404;
+    font-weight: 500;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Responsive design for charts */
+@media (max-width: 768px) {
+    .payoff-chart-svg {
+        width: 100%;
+        height: 300px;
+    }
+    
+    .chart-info-panel {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .svg-chart-wrapper {
+        padding: 0;
+    }
+}
+
+/* Animation for chart elements */
+.chart-point {
+    transition: all 0.2s ease;
+}
+
+.payoff-chart-svg .axes line {
+    shape-rendering: crispEdges;
+}
+
+.payoff-chart-svg text {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    user-select: none;
+}
+
+/* Tooltip styles */
+.chart-point title {
+    font-size: 12px;
+}
+
 /* Global Styles */
 * {
     margin: 0;
@@ -226,6 +431,17 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Edit mode styles */
+.position-card.editing {
+    border-color: #ffc107;
+    background: #fffbf0;
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.2);
+}
+
+.position-card.editing:hover {
+    border-color: #ffc107;
+}
+
 .spot-position {
     border-left: 4px solid #28a745;
 }
@@ -254,16 +470,70 @@ body {
     font-weight: 600;
 }
 
+/* Action buttons container */
+.position-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.edit-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+}
+
 .remove-btn {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
-    font-size: 1.2rem;
+    font-size: 1rem;
     line-height: 1;
+}
+
+/* Edit form styles */
+.position-edit-form {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+}
+
+.form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+}
+
+.form-input {
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+/* Small button styles for edit mode */
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
 }
 
 .position-info {
