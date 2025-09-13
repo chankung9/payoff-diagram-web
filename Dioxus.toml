@@ -1,16 +1,7 @@
 [application]
-name = "payoff-diagram-web"
 
 [web.app]
 title = "Payoff Diagram Web"
-base_path = "."
 
-[web.watcher]
-reload_html = true
-watch_path = ["src", "assets"]
-
-[web.resource]
-style = ["assets/main.css"]
-
-[bundle]
-identifier = "com.payoff-diagram.web"
+[web.resource.dev]
+script = []

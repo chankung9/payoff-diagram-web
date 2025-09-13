@@ -1,11 +1,20 @@
+use dioxus::prelude::*;
+
 mod components;
 mod models;
 mod utils;
 mod engine;
 
-#[cfg(not(target_arch = "wasm32"))]
+const MAIN_CSS: Asset = asset!("/assets/main.css");
+
 fn main() {
-    println!("This app is designed to run in the browser with WASM");
-    println!("Build with: wasm-pack build --target web --out-dir pkg");
-    println!("Serve with: python3 -m http.server 8080");
+    dioxus::launch(App);
+}
+
+#[component]
+fn App() -> Element {
+    rsx! {
+        document::Link { rel: "stylesheet", href: MAIN_CSS }
+        components::app::App {}
+    }
 }
