@@ -64,8 +64,23 @@ pub fn App() -> Element {
             main {
                 class: "app-main",
                 
+                // Chart Section - Full Width at Top
                 div {
-                    class: "app-grid",
+                    class: "chart-section-top",
+                    div {
+                        class: "section chart-section-full",
+                        PayoffChart {
+                            positions: positions.read().clone(),
+                            price_start: price_start(),
+                            price_end: price_end(),
+                            step_size: step_size()
+                        }
+                    }
+                }
+                
+                // Controls and Position Management - Grid Layout Below
+                div {
+                    class: "app-grid-bottom",
                     
                     // Left Column: Position Management
                     div {
@@ -106,7 +121,7 @@ pub fn App() -> Element {
                         }
                     }
                     
-                    // Right Column: Chart and Controls
+                    // Right Column: Chart Controls Only
                     div {
                         class: "right-column",
                         
@@ -127,16 +142,6 @@ pub fn App() -> Element {
                                     // Force re-render of chart
                                     // The chart will automatically update due to reactive signals
                                 }
-                            }
-                        }
-                        
-                        div {
-                            class: "section chart-section",
-                            PayoffChart {
-                                positions: positions.read().clone(),
-                                price_start: price_start(),
-                                price_end: price_end(),
-                                step_size: step_size()
                             }
                         }
                     }

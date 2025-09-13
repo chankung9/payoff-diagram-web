@@ -7,11 +7,13 @@ A web application for creating and visualizing payoff diagrams for various finan
 - **Position Input**: Add different types of financial positions (Spot, Call/Put Options, Futures)
 - **Position Management**: Toggle positions on/off without deletion, inline editing capabilities
 - **Payoff Calculation**: Calculate profit/loss across price ranges with active position filtering
-- **Interactive Charts**: Visualize payoff diagrams with adjustable resolution and modular chart engines
+- **Interactive Charts**: Full-width chart display at top with enhanced visibility and modular chart engines
 - **Long/Short Support**: Visual indicators for position direction with color-coded styling
 - **Auto-Range Calculation**: Dynamic price range adjustment based on position strike prices
+- **Enhanced Layout**: Chart prominently displayed at top, controls organized below for better workflow
+- **Responsive Design**: Optimized for wide screens with adaptive chart sizing (450px-650px)
 - **Data Management**: Export/Import position data as JSON
-- **Responsive UI**: Clean, user-friendly interface with smooth transitions
+- **Professional UI**: Clean, user-friendly interface with smooth transitions and enhanced spacing
 
 ## Technology Stack
 
@@ -186,6 +188,15 @@ The position toggle feature allows you to:
 - ✅ **Update charts automatically** - only active positions are included in calculations
 - ✅ **Preserve position data** - disabled positions retain all their information
 - ✅ **Smooth transitions** - CSS animations provide smooth state changes
+
+### Chart Layout and Navigation
+
+The application features an **enhanced chart-first layout** for better analysis workflow:
+
+- **📊 Full-Width Chart Display**: Charts are prominently displayed at the top in a dedicated full-width section
+- **🎯 Enhanced Visibility**: Larger chart size (450px-650px) adapts to screen size for better readability
+- **⚙️ Organized Controls**: Position management and chart controls are neatly organized below the chart
+- **📱 Responsive Design**: Layout adapts from desktop (side-by-side) to mobile (stacked) seamlessly
 
 ### Chart Controls
 

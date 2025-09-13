@@ -326,11 +326,38 @@ body {
 .app-main {
     flex: 1;
     padding: 2rem;
-    max-width: 1400px;
+    max-width: 1600px; /* Increased for wider screens */
     margin: 0 auto;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 }
 
+/* Chart Section - Full Width at Top */
+.chart-section-top {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.chart-section-full {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 2px solid #e8ecf0;
+    min-height: 500px;
+}
+
+/* Bottom Grid Layout for Controls and Positions */
+.app-grid-bottom {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    min-height: 400px;
+}
+
+/* Legacy app-grid for backwards compatibility */
 .app-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -350,6 +377,62 @@ body {
     padding: 1.5rem;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border: 2px solid #f0f0f0;
+}
+
+/* Enhanced Chart Section Styling */
+.chart-section-full .payoff-chart-container {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+}
+
+.chart-section-full .svg-chart-container {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 1rem 0;
+}
+
+.chart-section-full .payoff-chart-svg {
+    width: 100%;
+    max-width: 100%;
+    height: 450px;
+    border: 1px solid #e0e6ed;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+/* Wide Screen Enhancements */
+@media (min-width: 1200px) {
+    .app-main {
+        max-width: 1800px;
+        padding: 2.5rem;
+    }
+    
+    .chart-section-full {
+        padding: 2.5rem;
+        min-height: 600px;
+    }
+    
+    .chart-section-full .payoff-chart-svg {
+        height: 550px;
+    }
+    
+    .app-grid-bottom {
+        grid-template-columns: 1.2fr 0.8fr; /* Give more space to positions */
+        gap: 3rem;
+    }
+}
+
+@media (min-width: 1600px) {
+    .chart-section-full .payoff-chart-svg {
+        height: 650px;
+    }
+    
+    .chart-section-full {
+        min-height: 700px;
+    }
 }
 
 /* Position Form Styles */
@@ -877,6 +960,11 @@ body {
 
 /* Responsive Design */
 @media (max-width: 1024px) {
+    .app-grid-bottom {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
     .app-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
@@ -885,6 +973,16 @@ body {
     .controls-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
+    }
+    
+    /* Chart stays full width on tablets */
+    .chart-section-full {
+        padding: 1.5rem;
+        min-height: 400px;
+    }
+    
+    .chart-section-full .payoff-chart-svg {
+        height: 380px;
     }
 }
 
@@ -899,6 +997,17 @@ body {
     
     .app-main {
         padding: 1rem;
+        gap: 1.5rem;
+    }
+    
+    /* Mobile: Chart section adjustments */
+    .chart-section-full {
+        padding: 1rem;
+        min-height: 350px;
+    }
+    
+    .chart-section-full .payoff-chart-svg {
+        height: 320px;
     }
     
     .form-row {
