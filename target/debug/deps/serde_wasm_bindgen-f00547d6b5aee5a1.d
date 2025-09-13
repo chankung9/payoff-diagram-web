@@ -1,0 +1,9 @@
+/home/worrapong-l/Workspace/payoff-diagram-web/target/debug/deps/libserde_wasm_bindgen-f00547d6b5aee5a1.rmeta: /home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/lib.rs /home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/de.rs /home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/error.rs /home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/ser.rs /home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/../README.md
+
+/home/worrapong-l/Workspace/payoff-diagram-web/target/debug/deps/serde_wasm_bindgen-f00547d6b5aee5a1.d: /home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/lib.rs /home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/de.rs /home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/error.rs /home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/ser.rs /home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/../README.md
+
+/home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/lib.rs:
+/home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/de.rs:
+/home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/error.rs:
+/home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/ser.rs:
+/home/worrapong-l/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde-wasm-bindgen-0.5.0/src/../README.md:
