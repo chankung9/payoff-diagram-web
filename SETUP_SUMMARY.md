@@ -2,81 +2,85 @@
 
 ## ✅ Epic 0: System & Directory Design - COMPLETED
 
-### Task 0.1: ✅ Project Directory Structure ที่สร้างแล้ว
+### Task 0.1: ✅ Project Directory Structure (Standard Dioxus)
 ```
 payoff-diagram-web/
 ├── src/
-│   ├── main.rs              # Binary entry point (สำหรับ testing)
-│   ├── lib.rs               # WASM entry point
+│   ├── main.rs              # Standard Dioxus entry point
 │   ├── components/          # UI components
 │   │   ├── mod.rs           # Component module exports
-│   │   └── app.rs           # Main App component
+│   │   ├── app.rs           # Main App component
+│   │   ├── position_form.rs # Position input form
+│   │   ├── position_list.rs # Position management
+│   │   ├── payoff_chart.rs  # Chart component
+│   │   └── chart_controls.rs# Chart controls
 │   ├── models/              # Data models
 │   │   ├── mod.rs           # Model exports
 │   │   ├── position.rs      # Position data structures
 │   │   └── payoff.rs        # Payoff calculation logic
+│   ├── engine/              # Business logic engine
+│   │   ├── mod.rs           # Engine exports
+│   │   ├── payoff_engine.rs # Core calculations
+│   │   ├── portfolio_engine.rs # Portfolio analysis
+│   │   └── validation_engine.rs # Input validation
 │   └── utils/               # Utility functions
-│       ├── mod.rs           # Utility exports
-│       ├── export.rs        # Data export functionality
-│       └── import.rs        # Data import functionality
+│       └── mod.rs           # JSON export/import (simplified)
 ├── assets/
 │   └── main.css            # Application styles
-├── pkg/                    # Generated WASM package
-├── tests/                  # Test files
-├── Cargo.toml             # Rust dependencies
-├── Dioxus.toml           # Dioxus configuration
-├── index.html            # Main HTML file
+├── target/                 # Build artifacts (auto-generated)
+├── Cargo.toml             # Rust dependencies (simplified)
+├── Dioxus.toml           # Dioxus configuration (clean)
 └── README.md             # Project documentation
 ```
 
 ### Task 0.2: ✅ System Overview Documentation
-- ✅ README.md พร้อม feature overview, tech stack, และ roadmap
-- ✅ Project.md พร้อมแผนการพัฒนาแบบละเอียด
-- ✅ Architecture Documentation ใน README
+- ✅ README.md พร้อม updated tech stack และ dx workflow
+- ✅ Project.md พร้อม Epic progress tracking
+- ✅ ENGINE_ARCHITECTURE.md พร้อม clean architecture design
 
-### Task 0.3: ✅ Build/Run Workflow
-- ✅ WASM build ด้วย `wasm-pack build --target web --out-dir pkg`
-- ✅ Local server ด้วย `python3 -m http.server 8080`
-- ✅ Development workflow ใน README.md
+### Task 0.3: ✅ Build/Run Workflow (Standard Dioxus)
+- ✅ Development: `dx serve` (hot reload included)
+- ✅ Production: `dx build --release`
+- ✅ No manual WASM building required
 
 ## ✅ Epic 1: Project Scaffold - COMPLETED
 
-### Task 1.1: ✅ Dioxus + WASM scaffold
-- ✅ Cargo.toml configured for WASM target
-- ✅ Dependencies: Dioxus, wasm-bindgen, web-sys, js-sys
-- ✅ lib.rs สำหรับ WASM entry point
-- ✅ main.rs สำหรับ development/testing
+### Task 1.1: ✅ Standard Dioxus scaffold
+- ✅ Cargo.toml configured for standard Dioxus app
+- ✅ Dependencies: Dioxus, serde, serde_json, web-sys, js-sys
+- ✅ No lib.rs needed (using main.rs entry point)
+- ✅ Clean feature flags for web/desktop/mobile
 
-### Task 1.2: ✅ WASM build integration
-- ✅ wasm-pack installed และ configured
-- ✅ Build script working: `wasm-pack build --target web --out-dir pkg`
-- ✅ Generated WASM files ใน pkg/ directory
+### Task 1.2: ✅ dx build/serve integration
+- ✅ Dioxus CLI workflow working
+- ✅ Auto-generated HTML and WASM
+- ✅ Asset management via asset!() macro
+- ✅ Hot reload for development
 
-### Task 1.3: ✅ Hello World page
-- ✅ Basic App component ที่แสดง welcome page
-- ✅ CSS styling พร้อม responsive design
-- ✅ HTML template พร้อม WASM integration
-- ✅ Local server running บน http://localhost:8080
+### Task 1.3: ✅ App foundation
+- ✅ Main App component with proper structure
+- ✅ CSS asset loading via document::Link
+- ✅ Component architecture ready for development
+- ✅ Clean separation: UI components ↔ Engine logic
 
-## 🎯 สิ่งที่สำเร็จแล้ว
+## 🎯 Major Improvements from Refactor
 
-1. **Complete Project Structure** - โครงสร้างโปรเจกต์ครบถ้วน
-2. **WASM Integration** - สามารถ compile และรัน Rust code ใน browser ได้
-3. **Basic UI Framework** - Dioxus components พร้อมใช้งาน
-4. **Data Models** - Position และ Payoff calculation structures
-5. **Utility Functions** - Export/Import functionality (พื้นฐาน)
-6. **Responsive CSS** - สวยงามและใช้งานได้บนทุก device
-7. **Development Workflow** - Build และ serve ได้แล้ว
+1. **Standard Dioxus Structure** - ไม่ต้องจัดการ WASM manually
+2. **Simplified Dependencies** - เหลือเฉพาะที่จำเป็น
+3. **dx CLI Workflow** - build/serve/reload ง่ายขึ้น
+4. **Clean Architecture** - แยก engine logic จาก UI
+5. **Auto-generated HTML** - ไม่ต้องมี index.html แยก
+6. **Asset Management** - ใช้ asset!() macro แทน web.resource
 
-## 📋 ขั้นตอนต่อไป (Epic 2-6)
+## 📋 Next Steps (Epic 2-6)
 
-### Epic 2: Position Form
+### Epic 2: Position Form 🚧 NEXT
 - [ ] สร้าง UI components สำหรับ input form
-- [ ] Form validation
-- [ ] State management สำหรับ positions
+- [ ] Form validation และ state management
+- [ ] เชื่อมต่อกับ Position models
 
 ### Epic 3: Payoff Logic Integration
-- [ ] เชื่อมต่อ UI กับ payoff calculation
+- [ ] เชื่อมต่อ UI กับ payoff calculation engine
 - [ ] Real-time calculation
 - [ ] Unit tests
 
@@ -86,7 +90,7 @@ payoff-diagram-web/
 - [ ] Resolution controls
 
 ### Epic 5: Data Management
-- [ ] เชื่อมต่อ export/import functions กับ UI
+- [ ] เชื่อมต่อ simplified JSON export/import
 - [ ] File handling ในเบราว์เซอร์
 - [ ] Data validation
 
@@ -95,9 +99,35 @@ payoff-diagram-web/
 - [ ] เพิ่ม example positions
 - [ ] Error handling และ user feedback
 
-## 🚀 การเริ่มต้นพัฒนา
+## 🚀 Development Workflow
 
-1. **Development Server**:
+1. **Start Development Server**:
+   ```bash
+   cd /home/worrapong-l/Workspace/payoff-diagram-web
+   dx serve
+   # Auto-opens browser at http://localhost:8080 with hot reload
+   ```
+
+2. **Build for Production**:
+   ```bash
+   dx build --release
+   # Output in target/dx/payoff-diagram-web/release/web/public
+   ```
+
+3. **Development**:
+   - แก้ไข Rust code ใน `src/` → auto reload
+   - แก้ไข CSS ใน `assets/` → auto reload
+   - HTML auto-generated by Dioxus
+
+## 🎉 Foundation Complete!
+
+เราได้สร้าง **Clean, Modern Dioxus Foundation** สำหรับ Payoff Diagram Web Application เรียบร้อยแล้ว! 
+
+ขั้นตอนต่อไปคือการเริ่มพัฒนา Epic 2: Position Form เพื่อให้ผู้ใช้สามารถกรอกข้อมูล financial positions ได้
+
+---
+*Updated on: September 14, 2025*
+*Status: Epic 0 & Epic 1 Complete ✅ | Standard Dioxus Architecture ✅*
    ```bash
    cd /home/worrapong-l/Workspace/payoff-diagram-web
    python3 -m http.server 8080

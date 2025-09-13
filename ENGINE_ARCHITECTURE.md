@@ -11,10 +11,11 @@ src/
 │   └── validation_engine.rs  # Input validation engine
 ├── models/                   # 📊 Pure data structures
 │   ├── mod.rs               # Model exports
-│   └── position.rs          # Position data types
+│   ├── position.rs          # Position data types
+│   └── payoff.rs            # PayoffPoint structure
 ├── components/              # 🎨 UI components (Dioxus)
 ├── utils/                   # 🛠️ Utility functions
-└── lib.rs                   # WASM entry point
+└── main.rs                  # Standard Dioxus entry point
 
 ```
 

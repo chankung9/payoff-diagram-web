@@ -14,7 +14,8 @@ A web application for creating and visualizing payoff diagrams for various finan
 
 - **Frontend Framework**: Dioxus (Rust)
 - **Compilation Target**: WebAssembly (WASM)
-- **Charts**: Plotters + Canvas
+- **Build System**: Dioxus CLI (`dx`)
+- **Charts**: Plotters + Canvas (planned)
 - **Data Format**: JSON for export/import
 - **No Backend Required**: Pure client-side application
 
@@ -23,7 +24,7 @@ A web application for creating and visualizing payoff diagrams for various finan
 ### Prerequisites
 
 - Rust (latest stable)
-- `wasm-pack` for building WASM
+- Dioxus CLI: `cargo install dioxus-cli`
 - A modern web browser
 
 ### Installation
@@ -39,7 +40,7 @@ cd payoff-diagram-web
 cargo build
 ```
 
-3. Build and run for development:
+3. Run development server:
 ```bash
 dx serve
 ```
@@ -60,22 +61,25 @@ payoff-diagram-web/
 │   ├── main.rs              # Application entry point
 │   ├── components/          # UI components
 │   │   ├── mod.rs
+│   │   ├── app.rs           # Main App component
 │   │   ├── position_form.rs # Position input form
-│   │   ├── chart.rs         # Chart component
-│   │   └── controls.rs      # Control panels
+│   │   ├── position_list.rs # Position list/management
+│   │   ├── payoff_chart.rs  # Chart component
+│   │   └── chart_controls.rs# Control panels
 │   ├── models/              # Data models
 │   │   ├── mod.rs
 │   │   ├── position.rs      # Position structs
 │   │   └── payoff.rs        # Payoff calculation
-│   ├── utils/               # Utility functions
+│   ├── engine/              # Business logic engine
 │   │   ├── mod.rs
-│   │   ├── export.rs        # Export functionality
-│   │   └── import.rs        # Import functionality
-│   └── styles/              # CSS styles
-│       └── main.css
+│   │   ├── payoff_engine.rs # Core calculations
+│   │   ├── portfolio_engine.rs # Portfolio analysis
+│   │   └── validation_engine.rs # Input validation
+│   └── utils/               # Utility functions
+│       └── mod.rs           # JSON export/import
 ├── assets/                  # Static assets
-├── dist/                    # Built files (auto-generated)
-├── tests/                   # Test files
+│   └── main.css            # Application styles
+├── target/                  # Build artifacts (auto-generated)
 ├── Cargo.toml
 ├── Dioxus.toml             # Dioxus configuration
 └── README.md
@@ -86,17 +90,38 @@ payoff-diagram-web/
 ### Epic 0: System & Directory Design ✅
 - [x] Project Directory Structure
 - [x] System Overview Documentation
-- [x] Build/Run Workflow
+- [x] Build/Run Workflow with Dioxus CLI
 
-### Epic 1: Project Scaffold
-- [ ] Create Dioxus + WASM scaffold
-- [ ] Setup build scripts
-- [ ] Create Home page component
+### Epic 1: Project Scaffold ✅
+- [x] Create Dioxus + WASM scaffold
+- [x] Setup dx build/serve workflow
+- [x] Create App component foundation
 
 ### Epic 2: Position Form
 - [ ] Design Position input UI
 - [ ] Implement position data structures
 - [ ] Input validation
+
+### Epic 3: Payoff Logic
+- [ ] Spot position calculations
+- [ ] Options calculations (Call/Put)
+- [ ] Futures calculations
+- [ ] Unit tests
+
+### Epic 4: Chart Rendering
+- [ ] Integrate chart library
+- [ ] Payoff visualization
+- [ ] Resolution controls
+
+### Epic 5: Data Management
+- [ ] Export to JSON
+- [ ] Import from JSON
+- [ ] Data validation
+
+### Epic 6: UI/UX Enhancement
+- [ ] UI polish
+- [ ] Example positions
+- [ ] Error handling
 
 ### Epic 3: Payoff Logic
 - [ ] Spot position calculations
