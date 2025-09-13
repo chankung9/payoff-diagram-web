@@ -76,7 +76,7 @@ pub fn export_data(
     let data_array = js_sys::Array::new();
     data_array.push(&JsValue::from_str(&json_data));
     
-    let mut blob_options = BlobPropertyBag::new();
+    let blob_options = BlobPropertyBag::new();
     blob_options.set_type("application/json");
     
     let blob = Blob::new_with_str_sequence_and_options(&data_array, &blob_options)?;
@@ -122,7 +122,7 @@ pub fn export_to_clipboard(
 
     // Use the Clipboard API to copy to clipboard if available
     let window = web_sys::window().unwrap();
-    let navigator = window.navigator();
+    let _navigator = window.navigator();
     
     // Try to use clipboard writeText (simplified approach)
     // This is a basic implementation - in production you'd want better error handling

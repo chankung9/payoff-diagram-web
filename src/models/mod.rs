@@ -1,7 +1,5 @@
-// Model modules
+// Model modules - Pure data structures only
 pub mod position;
-pub mod payoff;
 
 // Re-export main types
 pub use position::{Position, PositionType, SpotPosition, OptionPosition, FuturesPosition, OptionType};
-pub use payoff::{PayoffCalculator, PayoffPoint};

@@ -59,7 +59,7 @@ pub fn import_from_clipboard(
     callback: Box<dyn Fn(Result<(Vec<Position>, ExportSettings), ImportError>)>,
 ) -> Result<(), JsValue> {
     // Simplified clipboard reading using eval
-    let clipboard_text = js_sys::eval("navigator.clipboard.readText()")
+    let _clipboard_text = js_sys::eval("navigator.clipboard.readText()")
         .map_err(|_| JsValue::from_str("Clipboard not supported"))?;
     
     // This is a simplified approach - in production you'd want proper promise handling

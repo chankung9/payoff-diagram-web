@@ -588,3 +588,104 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+/* Chart Styles */
+.chart-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.stat-item strong {
+    color: #495057;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.stat-item span {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.stat-item.profit span {
+    color: #28a745;
+}
+
+.stat-item.loss span {
+    color: #dc3545;
+}
+
+.chart-placeholder {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.chart-placeholder h4 {
+    color: #495057;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.ascii-chart {
+    font-family: 'Courier New', monospace;
+    background: #f8f9fa;
+    border-radius: 6px;
+    padding: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.chart-row {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+.chart-row.ellipsis {
+    justify-content: center;
+    font-style: italic;
+    color: #6c757d;
+    border-top: 1px solid #e9ecef;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+}
+
+.chart-row .price {
+    min-width: 80px;
+    text-align: right;
+    color: #495057;
+    font-weight: 500;
+}
+
+.chart-row .separator {
+    margin: 0 0.5rem;
+    color: #6c757d;
+}
+
+.chart-row .payoff {
+    min-width: 80px;
+    text-align: right;
+    font-weight: 600;
+}
+
+.chart-row .payoff.profit {
+    color: #28a745;
+}
+
+.chart-row .payoff.loss {
+    color: #dc3545;
+}
