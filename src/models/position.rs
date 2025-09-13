@@ -16,7 +16,7 @@ pub enum OptionType {
 }
 
 /// Main position enum that contains all position types
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum Position {
     Spot(SpotPosition),
     Option(OptionPosition),
@@ -24,7 +24,7 @@ pub enum Position {
 }
 
 /// Spot position (direct ownership of underlying asset)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SpotPosition {
     pub quantity: f64,          // Number of units (positive = long, negative = short)
     pub entry_price: f64,       // Price at which position was entered
@@ -32,7 +32,7 @@ pub struct SpotPosition {
 }
 
 /// Option position (Call or Put)
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct OptionPosition {
     pub option_type: OptionType,    // Call or Put
     pub quantity: f64,              // Number of contracts (positive = long, negative = short)
@@ -43,7 +43,7 @@ pub struct OptionPosition {
 }
 
 /// Futures position
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct FuturesPosition {
     pub quantity: f64,          // Number of contracts (positive = long, negative = short)
     pub entry_price: f64,       // Price at which futures was entered

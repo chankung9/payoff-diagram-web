@@ -1,10 +1,13 @@
 // Component modules
 pub mod app;
+pub mod position_form;
+pub mod position_list;
+pub mod chart_controls;
+pub mod payoff_chart;
 
-// Re-export components
+// Make components available at module level
 pub use app::App;
-
-// Future component modules (to be implemented)
-// pub mod position_form;
-// pub mod chart;
-// pub mod controls;
+pub use position_form::PositionForm;
+pub use position_list::PositionList;
+pub use chart_controls::ChartControls;
+pub use payoff_chart::PayoffChart;

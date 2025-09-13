@@ -7,14 +7,13 @@ mod utils;
 
 use components::App;
 
-#[wasm_bindgen(start)]
+// Entry point for WASM
+#[cfg(target_arch = "wasm32")]
 pub fn main() {
-    // Set panic hook for better debugging
-    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
-    
-    // Initialize console log for debugging
+    // Setup console error panics and logging
+    console_error_panic_hook::set_once();
     wasm_logger::init(wasm_logger::Config::default());
     
     // Launch the Dioxus app
-    launch(App);
+    dioxus::launch(App);
 }

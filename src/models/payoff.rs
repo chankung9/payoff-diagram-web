@@ -2,7 +2,7 @@ use super::position::{Position, SpotPosition, OptionPosition, FuturesPosition, O
 use serde::{Deserialize, Serialize};
 
 /// A single point on the payoff diagram
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct PayoffPoint {
     pub underlying_price: f64,
     pub profit_loss: f64,
