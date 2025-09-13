@@ -1,3 +1,89 @@
+/* SVG Chart Interactive Elements */
+.svg-chart-wrapper {
+    width: 100%;
+    height: auto;
+    min-height: 400px;
+    max-height: 600px;
+    aspect-ratio: 2/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible; /* Allow tooltips to show outside bounds */
+    position: relative;
+}
+
+.payoff-chart-svg {
+    user-select: none;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    width: 100%;
+    height: auto;
+    overflow: visible; /* Allow tooltips to show outside SVG bounds */
+}
+
+.chart-point {
+    transition: r 0.2s ease, opacity 0.2s ease;
+}
+
+.chart-point:hover {
+    r: 8 !important;
+    opacity: 1 !important;
+    filter: drop-shadow(3px 3px 6px rgba(0,0,0,0.4));
+}
+
+.draggable-legend {
+    transition: transform 0.1s ease;
+}
+
+.draggable-legend:hover {
+    filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.3));
+}
+
+.chart-tooltip {
+    animation: tooltipFadeIn 0.08s ease-out;
+    pointer-events: none;
+    z-index: 1000;
+    will-change: transform, opacity;
+}
+
+@keyframes tooltipFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.95) translateY(1px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Responsive adjustments for charts */
+@media (max-width: 1200px) {
+    .svg-chart-wrapper {
+        min-height: 350px;
+        max-height: 500px;
+    }
+}
+
+@media (max-width: 768px) {
+    .svg-chart-wrapper {
+        min-height: 300px;
+        max-height: 400px;
+        aspect-ratio: 1.8/1;
+    }
+    
+    .chart-tooltip {
+        transform: scale(0.8);
+    }
+}
+
+@media (max-width: 480px) {
+    .svg-chart-wrapper {
+        min-height: 250px;
+        max-height: 350px;
+        aspect-ratio: 1.6/1;
+    }
+}
+
 /* Chart Engine Selector */
 .chart-engine-selector {
     background: #ffffff;
@@ -247,19 +333,43 @@
     margin: 0 auto;
 }
 
-/* Responsive design for charts */
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .chart-and-form-section {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .position-form-side {
+        position: static;
+        height: auto;
+    }
+    
+    .chart-section-side {
+        order: 2;
+    }
+    
+    .position-form-side {
+        order: 1;
+    }
+}
+
 @media (max-width: 768px) {
-    .payoff-chart-svg {
-        width: 100%;
-        height: 300px;
+    .app-grid {
+        padding: 1rem;
     }
     
-    .chart-info-panel {
-        grid-template-columns: 1fr !important;
+    .chart-and-form-section {
+        gap: 0.5rem;
     }
     
-    .svg-chart-wrapper {
-        padding: 0;
+    .chart-section-side,
+    .position-form-side {
+        padding: 1rem;
+    }
+    
+    .position-list {
+        margin-top: 1rem;
     }
 }
 
@@ -334,7 +444,38 @@ body {
     gap: 2rem;
 }
 
-/* Chart Section - Full Width at Top */
+/* Chart and Form Section - Side by Side (9:3 ratio) */
+.chart-and-form-section {
+    display: grid;
+    grid-template-columns: 3fr 1fr; /* 9:3 ratio (3:1) */
+    gap: 2rem;
+    margin-bottom: 2rem;
+    min-height: 500px;
+}
+
+.chart-section-side {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: 2px solid #e8ecf0;
+    min-height: 500px;
+}
+
+.position-form-side {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 2px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    position: sticky;
+    top: 2rem;
+}
+
+/* Chart Section - Full Width at Top (Legacy) */
 .chart-section-top {
     width: 100%;
     margin-bottom: 1rem;

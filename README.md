@@ -7,7 +7,12 @@ A web application for creating and visualizing payoff diagrams for various finan
 - **Position Input**: Add different types of financial positions (Spot, Call/Put Options, Futures)
 - **Position Management**: Toggle positions on/off without deletion, inline editing capabilities
 - **Payoff Calculation**: Calculate profit/loss across price ranges with active position filtering
-- **Interactive Charts**: Full-width chart display at top with enhanced visibility and modular chart engines
+- **Interactive Charts**: SVG-based interactive charts with hover effects and draggable legend
+- **Chart Interactivity**: 
+  - Hover data display in interactive legend (no popup flickering)
+  - Draggable legend with live/last data indicators
+  - Responsive SVG scaling and smooth animations
+  - Real-time price, P&L, and percentage change display
 - **Long/Short Support**: Visual indicators for position direction with color-coded styling
 - **Auto-Range Calculation**: Dynamic price range adjustment based on position strike prices
 - **Enhanced Layout**: Chart prominently displayed at top, controls organized below for better workflow
@@ -20,7 +25,7 @@ A web application for creating and visualizing payoff diagrams for various finan
 - **Frontend Framework**: Dioxus 0.6.3 (Rust)
 - **Compilation Target**: WebAssembly (WASM)
 - **Build System**: Dioxus CLI (`dx`)
-- **Charts**: Modular chart engine system (SVG Native, Canvas Rust planned)
+- **Charts**: Interactive SVG charts with hover effects, draggable legends, and real-time data display
 - **State Management**: Reactive signals with use_signal
 - **Styling**: CSS3 with smooth transitions and responsive design
 - **Data Format**: JSON for export/import
@@ -125,6 +130,9 @@ payoff-diagram-web/
 - [x] Interactive payoff visualization
 - [x] Chart controls and resolution settings
 - [x] Responsive chart design
+- [x] Interactive hover effects with legend display
+- [x] Draggable legend with live/last data indicators
+- [x] Smooth animations without popup flickering
 
 ### Epic 5: Enhanced UI/UX ✅
 - [x] Position toggle checkbox controls
@@ -132,13 +140,15 @@ payoff-diagram-web/
 - [x] Smooth CSS transitions
 - [x] Responsive design improvements
 - [x] Position direction indicators
+- [x] Chart engine selection (hidden for simplicity)
+- [x] Interactive chart tooltips integrated into legend
 
-### Epic 5: Data Management
+### Epic 6: Data Management
 - [ ] Export to JSON
 - [ ] Import from JSON
 - [ ] Data validation
 
-### Epic 6: UI/UX Enhancement
+### Epic 7: UI/UX Enhancement
 - [ ] UI polish
 - [ ] Example positions
 - [ ] Error handling

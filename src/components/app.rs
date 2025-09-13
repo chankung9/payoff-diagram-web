@@ -64,11 +64,13 @@ pub fn App() -> Element {
             main {
                 class: "app-main",
                 
-                // Chart Section - Full Width at Top
+                // Chart and Position Form - Side by Side
                 div {
-                    class: "chart-section-top",
+                    class: "chart-and-form-section",
+                    
+                    // Chart Section - 9/12 width
                     div {
-                        class: "section chart-section-full",
+                        class: "section chart-section-side",
                         PayoffChart {
                             positions: positions.read().clone(),
                             price_start: price_start(),
@@ -76,24 +78,25 @@ pub fn App() -> Element {
                             step_size: step_size()
                         }
                     }
+                    
+                    // Position Form - 3/12 width
+                    div {
+                        class: "section position-form-side",
+                        PositionForm {
+                            on_add_position: move |position: Position| {
+                                positions.write().push(position);
+                            }
+                        }
+                    }
                 }
                 
-                // Controls and Position Management - Grid Layout Below
+                // Position List and Chart Controls - Grid Layout Below
                 div {
                     class: "app-grid-bottom",
                     
-                    // Left Column: Position Management
+                    // Left Column: Position List Only
                     div {
                         class: "left-column",
-                        
-                        div {
-                            class: "section position-input-section",
-                            PositionForm {
-                                on_add_position: move |position: Position| {
-                                    positions.write().push(position);
-                                }
-                            }
-                        }
                         
                         div {
                             class: "section position-list-section",

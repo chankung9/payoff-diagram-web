@@ -66,6 +66,15 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
     // Chart engine selection state (like Binance's chart selector)
     let mut selected_engine = use_signal(|| ChartEngine::SvgNative);
     
+    // Interactive legend dragging state
+    let mut legend_position = use_signal(|| (500.0, 50.0)); // Default position (moved left for larger legend)
+    let mut is_dragging = use_signal(|| false);
+    let mut drag_offset = use_signal(|| (0.0, 0.0));
+    
+    // Hover data state for legend display
+    let mut hover_data = use_signal(|| None::<(f64, f64, f64)>); // price, pnl, percent
+    let mut last_hover_data = use_signal(|| (0.0, 0.0, 0.0)); // Keep last hovered data
+    
     // Calculate payoff data
     let payoff_data = if props.positions.is_empty() {
         Vec::new()
@@ -127,34 +136,34 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
         div {
             class: "payoff-chart-container",
             
-            // Chart Engine Selector (simplified version)
-            div {
-                class: "chart-engine-selector",
-                h3 { "📊 Chart Engine Selection" }
-                
-                div {
-                    class: "engine-dropdown",
-                    select {
-                        value: "{selected_engine().display_name()}",
-                        onchange: move |evt| {
-                            if evt.value() == "SVG Native" {
-                                selected_engine.set(ChartEngine::SvgNative);
-                            }
-                        },
-                        
-                        option { value: "SVG Native", "SVG Native (Available)" }
-                        option { value: "Canvas Rust", "Canvas Rust (Coming Soon)" }
-                        option { value: "Chart.js", "Chart.js (Coming Soon)" }
-                        option { value: "TradingView", "TradingView (Coming Soon)" }
-                        option { value: "Plotters", "Plotters (Coming Soon)" }
-                    }
-                    
-                    div {
-                        class: "engine-info",
-                        "Current: {selected_engine().display_name()}"
-                    }
-                }
-            }
+            // Chart Engine Selector (hidden for now)
+            // div {
+            //     class: "chart-engine-selector",
+            //     h3 { "📊 Chart Engine Selection" }
+            //     
+            //     div {
+            //         class: "engine-dropdown",
+            //         select {
+            //             value: "{selected_engine().display_name()}",
+            //             onchange: move |evt| {
+            //                 if evt.value() == "SVG Native" {
+            //                     selected_engine.set(ChartEngine::SvgNative);
+            //                 }
+            //             },
+            //             
+            //             option { value: "SVG Native", "SVG Native (Available)" }
+            //             option { value: "Canvas Rust", "Canvas Rust (Coming Soon)" }
+            //             option { value: "Chart.js", "Chart.js (Coming Soon)" }
+            //             option { value: "TradingView", "TradingView (Coming Soon)" }
+            //             option { value: "Plotters", "Plotters (Coming Soon)" }
+            //         }
+            //         
+            //         div {
+            //             class: "engine-info",
+            //             "Current: {selected_engine().display_name()}"
+            //         }
+            //     }
+            // }
             
             // Chart statistics (keep existing)
             div {
@@ -236,10 +245,29 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                     
                                     svg {
                                         class: "payoff-chart-svg",
-                                        width: "800",
-                                        height: "400", 
+                                        width: "100%",
+                                        height: "100%", 
                                         view_box: "0 0 800 400",
-                                        style: "border: 1px solid #dee2e6; background: #f8f9fa;",
+                                        preserve_aspect_ratio: "xMidYMid meet",
+                                        style: "border: 1px solid #dee2e6; background: #f8f9fa; min-height: 400px; max-height: 600px;",
+                                        
+                                        // Global mouse events for dragging
+                                        onmousemove: move |evt| {
+                                            if is_dragging() {
+                                                let rect = evt.client_coordinates();
+                                                let offset = drag_offset();
+                                                let new_x = (rect.x as f64 - offset.0).max(0.0).min(660.0); // Constrain within SVG
+                                                let new_y = (rect.y as f64 - offset.1).max(0.0).min(320.0);
+                                                legend_position.set((new_x, new_y));
+                                            }
+                                        },
+                                        onmouseup: move |_| {
+                                            is_dragging.set(false);
+                                        },
+                                        onmouseleave: move |_| {
+                                            is_dragging.set(false);
+                                            hover_data.set(None); // Clear hover when leaving SVG
+                                        },
                                         
                                         // Define chart dimensions
                                         defs {
@@ -338,30 +366,55 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                                     }
                                                     
                                                     // Data points (interactive)
-                                                    for (i, point) in chart_data.payoff_points.iter().enumerate() {
-                                                        if i % 3 == 0 { // Show every 3rd point to avoid clutter
-                                                            {
-                                                                let x = (point.price - min_price) / price_range * 640.0;
-                                                                let y = 320.0 - ((point.payoff - min_payoff) / payoff_range * 320.0);
-                                                                rsx! {
-                                                                    circle {
-                                                                        cx: "{x}",
-                                                                        cy: "{y}",
-                                                                        r: "5",
-                                                                        fill: if point.payoff >= 0.0 { "#28a745" } else { "#dc3545" },
-                                                                        stroke: "#ffffff",
-                                                                        stroke_width: "2",
-                                                                        opacity: "0.8",
-                                                                        class: "chart-point",
-                                                                        style: "cursor: pointer; transition: all 0.2s ease;",
+                                                    {
+                                                        let points = chart_data.payoff_points.clone();
+                                                        let positions = props.positions.clone();
+                                                        rsx! {
+                                                            for (i, point) in points.iter().enumerate() {
+                                                                if i % 3 == 0 { // Show every 3rd point to avoid clutter
+                                                                    {
+                                                                        let x = (point.price - min_price) / price_range * 640.0;
+                                                                        let y = 320.0 - ((point.payoff - min_payoff) / payoff_range * 320.0);
                                                                         
-                                                                        // Hover effects
-                                                                        onmouseenter: move |_| {},
-                                                                        onmouseleave: move |_| {},
+                                                                        // Calculate percentage change
+                                                                        let initial_value = positions.iter()
+                                                                            .map(|pos| match pos {
+                                                                                Position::Option(opt) => opt.premium * opt.quantity.abs(),
+                                                                                Position::Spot(spot) => spot.entry_price * spot.quantity.abs(),
+                                                                                Position::Futures(fut) => fut.entry_price * fut.quantity.abs() * fut.contract_size,
+                                                                            })
+                                                                            .sum::<f64>();
+                                                                        let percent_change = if initial_value > 0.0 {
+                                                                            (point.payoff / initial_value) * 100.0
+                                                                        } else {
+                                                                            0.0
+                                                                        };
                                                                         
-                                                                        // Tooltip
-                                                                        title { 
-                                                                            "Price: ${point.price:.2} | P&L: ${point.payoff:.2}"
+                                                                        let price = point.price;
+                                                                        let payoff = point.payoff;
+                                                                        
+                                                                        rsx! {
+                                                                            circle {
+                                                                                cx: "{x}",
+                                                                                cy: "{y}",
+                                                                                r: "5",
+                                                                                fill: if point.payoff >= 0.0 { "#28a745" } else { "#dc3545" },
+                                                                                stroke: "#ffffff",
+                                                                                stroke_width: "2",
+                                                                                opacity: "0.8",
+                                                                                class: "chart-point",
+                                                                                style: "cursor: pointer; transition: all 0.2s ease;",
+                                                                                
+                                                                                // Enhanced hover effects with legend update
+                                                                                onmouseenter: move |_| {
+                                                                                    let data = (price, payoff, percent_change);
+                                                                                    hover_data.set(Some(data));
+                                                                                    last_hover_data.set(data);
+                                                                                },
+                                                                                onmouseleave: move |_| {
+                                                                                    hover_data.set(None);
+                                                                                }
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -370,47 +423,43 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                                     }
                                                     
                                                     // Breakeven points markers
-                                                    for be_point in chart_data.breakeven_points.iter() {
-                                                        {
-                                                            let x = (*be_point - min_price) / price_range * 640.0;
-                                                            rsx! {
-                                                                // Vertical line for breakeven
-                                                                line {
-                                                                    x1: "{x}",
-                                                                    y1: "0",
-                                                                    x2: "{x}",
-                                                                    y2: "320",
-                                                                    stroke: "#fd7e14",
-                                                                    stroke_width: "2",
-                                                                    stroke_dasharray: "6,3",
-                                                                    opacity: "0.8"
-                                                                }
-                                                                // Breakeven point marker
-                                                                circle {
-                                                                    cx: "{x}",
-                                                                    cy: "{zero_y}",
-                                                                    r: "8",
-                                                                    fill: "#fd7e14",
-                                                                    stroke: "#ffffff",
-                                                                    stroke_width: "3"
-                                                                }
-                                                                // Breakeven label
-                                                                text {
-                                                                    x: "{x}",
-                                                                    y: "{zero_y - 15.0}",
-                                                                    text_anchor: "middle",
-                                                                    font_size: "11",
-                                                                    font_weight: "bold",
-                                                                    fill: "#fd7e14",
-                                                                    "BE"
-                                                                }
-                                                                text {
-                                                                    x: "{x}",
-                                                                    y: "{zero_y - 4.0}",
-                                                                    text_anchor: "middle",
-                                                                    font_size: "10",
-                                                                    fill: "#6c757d",
-                                                                    "${be_point:.0}"
+                                                    {
+                                                        let breakeven_points = chart_data.breakeven_points.clone();
+                                                        rsx! {
+                                                            for be_point in breakeven_points.iter() {
+                                                                {
+                                                                    let x = (*be_point - min_price) / price_range * 640.0;
+                                                                    rsx! {
+                                                                        // Vertical line for breakeven
+                                                                        line {
+                                                                            x1: "{x}",
+                                                                            y1: "0",
+                                                                            x2: "{x}",
+                                                                            y2: "320",
+                                                                            stroke: "#fd7e14",
+                                                                            stroke_width: "2",
+                                                                            stroke_dasharray: "6,3",
+                                                                            opacity: "0.8"
+                                                                        }
+                                                                        // Breakeven point marker
+                                                                        circle {
+                                                                            cx: "{x}",
+                                                                            cy: "{zero_y}",
+                                                                            r: "8",
+                                                                            fill: "#fd7e14",
+                                                                            stroke: "#ffffff",
+                                                                            stroke_width: "3"
+                                                                        }
+                                                                        // Breakeven price label only
+                                                                        text {
+                                                                            x: "{x}",
+                                                                            y: "{zero_y - 10.0}",
+                                                                            text_anchor: "middle",
+                                                                            font_size: "10",
+                                                                            fill: "#6c757d",
+                                                                            "${be_point:.0}"
+                                                                        }
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -510,30 +559,119 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                             "Options Portfolio Payoff Diagram"
                                         }
                                         
-                                        // Interactive legend
+                                        // Interactive legend with hover data display (draggable)
                                         g {
-                                            transform: "translate(550, 50)",
-                                            // Legend background
+                                            transform: "translate({legend_position().0}, {legend_position().1})",
+                                            class: "draggable-legend",
+                                            style: "cursor: move;",
+                                            
+                                            // Legend background (expanded to show data)
                                             rect {
-                                                x: "0", y: "0", width: "140", height: "80",
-                                                fill: "#ffffff",
+                                                x: "0", y: "0", width: "180", height: "120",
+                                                fill: "rgba(255, 255, 255, 0.95)",
                                                 stroke: "#dee2e6",
                                                 stroke_width: "1",
-                                                rx: "4"
+                                                rx: "4",
+                                                style: "filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));",
+                                                
+                                                // Drag events
+                                                onmousedown: move |evt| {
+                                                    is_dragging.set(true);
+                                                    let rect = evt.client_coordinates();
+                                                    let current_pos = legend_position();
+                                                    drag_offset.set((rect.x as f64 - current_pos.0, rect.y as f64 - current_pos.1));
+                                                }
                                             }
-                                            // Legend items
-                                            line { x1: "10", y1: "15", x2: "30", y2: "15", stroke: "#007bff", stroke_width: "3" }
-                                            text { x: "35", y: "19", font_size: "11", fill: "#495057", "Payoff Curve" }
                                             
-                                            line { x1: "10", y1: "30", x2: "30", y2: "30", stroke: "#ffc107", stroke_width: "3", stroke_dasharray: "4,2" }
-                                            text { x: "35", y: "34", font_size: "11", fill: "#495057", "Break Even" }
+                                            // Legend title with drag handle indicator
+                                            text { 
+                                                x: "90", y: "12", 
+                                                text_anchor: "middle",
+                                                font_size: "10", 
+                                                font_weight: "bold",
+                                                fill: "#6c757d",
+                                                "📊 Interactive Legend (Drag Me)"
+                                            }
                                             
-                                            circle { cx: "20", cy: "45", r: "4", fill: "#28a745" }
-                                            text { x: "35", y: "49", font_size: "11", fill: "#495057", "Profit" }
+                                            // Chart legend items
+                                            line { x1: "10", y1: "25", x2: "30", y2: "25", stroke: "#007bff", stroke_width: "3" }
+                                            text { x: "35", y: "29", font_size: "9", fill: "#495057", "Payoff Curve" }
                                             
-                                            circle { cx: "20", cy: "60", r: "4", fill: "#dc3545" }
-                                            text { x: "35", y: "64", font_size: "11", fill: "#495057", "Loss" }
+                                            line { x1: "10", y1: "38", x2: "30", y2: "38", stroke: "#ffc107", stroke_width: "3", stroke_dasharray: "4,2" }
+                                            text { x: "35", y: "42", font_size: "9", fill: "#495057", "Break Even" }
+                                            
+                                            circle { cx: "20", cy: "51", r: "3", fill: "#28a745" }
+                                            text { x: "35", y: "55", font_size: "9", fill: "#495057", "Profit Zone" }
+                                            
+                                            circle { cx: "20", cy: "64", r: "3", fill: "#dc3545" }
+                                            text { x: "35", y: "68", font_size: "9", fill: "#495057", "Loss Zone" }
+                                            
+                                            // Separator line
+                                            line { x1: "10", y1: "75", x2: "170", y2: "75", stroke: "#dee2e6", stroke_width: "1" }
+                                            
+                                            // Hover data display section
+                                            {
+                                                let display_data = if let Some(current_data) = hover_data() {
+                                                    current_data
+                                                } else {
+                                                    last_hover_data()
+                                                };
+                                                
+                                                let (price, payoff, percent) = display_data;
+                                                let status = if hover_data().is_some() { "LIVE" } else { "LAST" };
+                                                
+                                                rsx! {
+                                                    // Data status indicator
+                                                    text { 
+                                                        x: "90", y: "88", 
+                                                        text_anchor: "middle",
+                                                        font_size: "8", 
+                                                        font_weight: "bold",
+                                                        fill: if hover_data().is_some() { "#28a745" } else { "#6c757d" },
+                                                        "{status} DATA"
+                                                    }
+                                                    
+                                                    // Price display
+                                                    text { 
+                                                        x: "10", y: "100", 
+                                                        font_size: "10", 
+                                                        font_weight: "bold",
+                                                        fill: "#212529",
+                                                        "Price: ${price:.2}"
+                                                    }
+                                                    
+                                                    // P&L display
+                                                    text { 
+                                                        x: "10", y: "112", 
+                                                        font_size: "10", 
+                                                        font_weight: "bold",
+                                                        fill: if payoff >= 0.0 { "#28a745" } else { "#dc3545" },
+                                                        "P&L: ${payoff:.2} ({percent:+.1}%)"
+                                                    }
+                                                }
+                                            }
+                                            
+                                            // Mini close button to minimize legend
+                                            circle {
+                                                cx: "170", cy: "10", r: "6",
+                                                fill: "#f8f9fa",
+                                                stroke: "#dee2e6",
+                                                style: "cursor: pointer;",
+                                                onclick: move |_| {
+                                                    // Move legend to corner when minimized
+                                                    legend_position.set((650.0, 50.0));
+                                                }
+                                            }
+                                            text {
+                                                x: "170", y: "13",
+                                                text_anchor: "middle",
+                                                font_size: "8",
+                                                fill: "#6c757d",
+                                                style: "cursor: pointer; user-select: none;",
+                                                "×"
+                                            }
                                         }
+                                        
                                     }
                                     
                                     // Chart info panel
