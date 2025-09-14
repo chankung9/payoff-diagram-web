@@ -228,6 +228,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative; /* Enable absolute positioning for legend */
 }
 
 .payoff-chart-svg {
@@ -974,56 +975,46 @@ body {
     height: auto;
 }
 
-/* Binance-style legend styling */
+/* Unified Binance-style legend styling for both desktop and mobile */
 .binance-legend {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     transition: opacity 0.2s ease, transform 0.2s ease;
+    filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.3));
+    /* Position at top-right corner of SVG */
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
 }
 
 .binance-legend:hover {
     transform: scale(1.02);
+    filter: drop-shadow(6px 6px 12px rgba(0,0,0,0.4));
 }
 
-/* Mobile responsive legend - optimized 210x315 size for mobile */
+/* Responsive adjustments for unified Binance legend */
 @media (max-width: 768px) {
-    .legend-background {
-        width: 210 !important; 
-        height: 315 !important; 
-    }
-    
-    /* Define CSS custom properties for mobile scaling */
     .binance-legend {
+        /* Mobile: Position at top-right but with smaller offset */
+        top: 10px;
+        right: 10px;
+        transform-origin: top right;
+        /* Compact mobile legend size */
         --mobile-scale: 1.0;
-        --legend-width: 210px;
-        --legend-height: 315px;
-        --close-btn-x: 190;
-        --close-btn-y: 20;
-        --close-btn-r: 12;
-        --title-x: 105;
-        --title-y: 25;
-        --title-size: 16px;
-        --text-scale: 1.0;
+        --legend-width: 260px;  /* Compact for mobile */
+        --legend-height: 320px; /* Compact for mobile */
     }
-    
-    /* Scale up text size */
-    .binance-legend text {
-        font-size: calc(var(--text-scale, 1) * 1em) !important;
-    }
-    
-    /* Adjust legend positioning for mobile - center it better */
+}
+
+@media (min-width: 769px) {
     .binance-legend {
-        transform-origin: center center;
-        /* Add padding to prevent text overflow */
-        padding: 5px;
-        box-sizing: border-box;
-    }
-    
-    /* Make background auto-expand for content */
-    .legend-background {
-        min-width: 210px !important;
-        min-height: 315px !important;
-        width: auto !important;
-        height: auto !important;
+        /* Desktop: Standard top-right positioning */
+        top: 20px;
+        right: 20px;
+        transform-origin: top right;
+        --desktop-scale: 1.0;
+        --legend-width: 220px;  /* Compact for desktop */
+        --legend-height: 280px; /* Compact for desktop */
     }
 }
 

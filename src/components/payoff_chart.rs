@@ -653,43 +653,45 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                             "Options Portfolio Payoff Diagram"
                                         }
                                         
-                                        // Interactive legend with hover data display (desktop) or mobile legend
-                                        if is_mobile() && legend_visible() {
-                                            // Mobile overlay to catch clicks outside popup
-                                            rect {
-                                                x: "0", y: "0", width: "800", height: "400",
-                                                fill: "rgba(0, 0, 0, 0.3)", // Semi-transparent overlay
-                                                style: "cursor: pointer;",
-                                                onclick: move |_| {
-                                                    // Close popup when clicking outside
-                                                    legend_visible.set(false);
+                                        // Unified Binance-style legend for both desktop and mobile
+                                        if legend_visible() {
+                                            // Background overlay for mobile (semi-transparent)
+                                            if is_mobile() {
+                                                rect {
+                                                    x: "0", y: "0", width: "800", height: "400",
+                                                    fill: "rgba(0, 0, 0, 0.3)", // Semi-transparent overlay
+                                                    style: "cursor: pointer;",
+                                                    onclick: move |_| {
+                                                        // Close popup when clicking outside
+                                                        legend_visible.set(false);
+                                                    }
                                                 }
                                             }
                                             
-                                            // Mobile Binance-style legend (larger scale)
+                                            // Unified Binance-style legend (positioned at top-right)
                                             g {
-                                                transform: "translate({legend_position().0}, {legend_position().1})",
-                                                class: "mobile-legend",
+                                                class: "binance-legend",
                                                 style: "cursor: move;",
                                                 
-                                                // Mobile drag events
+                                                // Drag events for both platforms
                                                 onmousedown: move |evt| {
                                                     is_dragging.set(true);
                                                     let rect = evt.client_coordinates();
-                                                    let current_pos = legend_position();
-                                                    drag_offset.set((rect.x as f64 - current_pos.0, rect.y as f64 - current_pos.1));
+                                                    drag_offset.set((rect.x as f64, rect.y as f64));
                                                 },
                                                 
-                                                // Larger legend background for mobile (Binance-style size: 320x420px)
+                                                // Compact legend background for top-right positioning
                                                 rect {
-                                                    x: "0", y: "0", width: "320", height: "420", // Binance-style mobile size
-                                                    fill: "rgba(30, 35, 41, 0.95)",
-                                                    stroke: "#F0B90B",
+                                                    x: "0", y: "0", 
+                                                    width: if is_mobile() { "260" } else { "220" }, // Smaller for top-right corner
+                                                    height: if is_mobile() { "320" } else { "280" }, // Compact height
+                                                    fill: "rgba(30, 35, 41, 0.95)", // Binance dark theme
+                                                    stroke: "#F0B90B", // Binance yellow
                                                     stroke_width: "2",
                                                     rx: "8",
                                                     style: "filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.3));",
                                                     
-                                                    // Double tap to close popup
+                                                    // Double tap to close popup (mobile)
                                                     ondoubleclick: move |_| {
                                                         legend_visible.set(false);
                                                     },
@@ -700,33 +702,72 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                                     }
                                                 }
                                                 
-                                                // Mobile title (proportional to Binance size)
+                                                // Legend title (responsive text size)
                                                 text { 
-                                                    x: "160", y: "30", // Center of 320px width
-                                                    text_anchor: "middle",
-                                                    font_size: "18", // Larger for Binance-style
+                                                    x: "20", // Left alignment for both mobile and desktop
+                                                    y: "30",
+                                                    text_anchor: "start", // Left align text
+                                                    font_size: if is_mobile() { "18" } else { "16" }, // Responsive font size
                                                     font_weight: "bold",
-                                                    fill: "#F0B90B",
+                                                    fill: "#F0B90B", // Binance yellow
                                                     "📊 Payoff Analysis"
                                                 }
                                                 
-                                                // Chart legend items (Binance-style mobile optimized)
-                                                line { x1: "20", y1: "55", x2: "45", y2: "55", stroke: "#02C076", stroke_width: "3" }
-                                                text { x: "50", y: "60", font_size: "14", fill: "#EAECEF", "Payoff Curve" }
+                                                // Chart legend items (Binance-style with responsive sizing)
+                                                line { 
+                                                    x1: "20", y1: "55", x2: "45", y2: "55", 
+                                                    stroke: "#02C076", // Binance green
+                                                    stroke_width: "3" 
+                                                }
+                                                text { 
+                                                    x: "50", y: "60", 
+                                                    font_size: if is_mobile() { "14" } else { "12" }, 
+                                                    fill: "#EAECEF", // Binance light gray
+                                                    "Payoff Curve" 
+                                                }
                                                 
-                                                line { x1: "20", y1: "80", x2: "45", y2: "80", stroke: "#F0B90B", stroke_width: "3", stroke_dasharray: "4,2" }
-                                                text { x: "50", y: "85", font_size: "14", fill: "#EAECEF", "Break Even" }
+                                                line { 
+                                                    x1: "20", y1: "80", x2: "45", y2: "80", 
+                                                    stroke: "#F0B90B", stroke_width: "3", 
+                                                    stroke_dasharray: "4,2" 
+                                                }
+                                                text { 
+                                                    x: "50", y: "85", 
+                                                    font_size: if is_mobile() { "14" } else { "12" }, 
+                                                    fill: "#EAECEF", 
+                                                    "Break Even" 
+                                                }
                                                 
-                                                circle { cx: "32", cy: "105", r: "5", fill: "#02C076" }
-                                                text { x: "50", y: "110", font_size: "14", fill: "#EAECEF", "Profit Zone" }
+                                                circle { 
+                                                    cx: "32", cy: "105", r: "5", 
+                                                    fill: "#02C076" // Binance green
+                                                }
+                                                text { 
+                                                    x: "50", y: "110", 
+                                                    font_size: if is_mobile() { "14" } else { "12" }, 
+                                                    fill: "#EAECEF", 
+                                                    "Profit Zone" 
+                                                }
                                                 
-                                                circle { cx: "32", cy: "130", r: "5", fill: "#F6465D" }
-                                                text { x: "50", y: "135", font_size: "14", fill: "#EAECEF", "Loss Zone" }
+                                                circle { 
+                                                    cx: "32", cy: "130", r: "5", 
+                                                    fill: "#F6465D" // Binance red
+                                                }
+                                                text { 
+                                                    x: "50", y: "135", 
+                                                    font_size: if is_mobile() { "14" } else { "12" }, 
+                                                    fill: "#EAECEF", 
+                                                    "Loss Zone" 
+                                                }
                                                 
-                                                // Separator line
-                                                line { x1: "20", y1: "155", x2: "300", y2: "155", stroke: "#474D57", stroke_width: "1" }
+                                                // Separator line (responsive width)
+                                                line { 
+                                                    x1: "20", y1: "155", 
+                                                    x2: if is_mobile() { "300" } else { "260" }, y2: "155", 
+                                                    stroke: "#474D57", stroke_width: "1" 
+                                                }
                                                 
-                                                // Real-time data display section (mobile optimized)
+                                                // Real-time data display section (responsive)
                                                 {
                                                     let display_data = if let Some(current_data) = hover_data() {
                                                         current_data
@@ -738,56 +779,68 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                                     let status = if hover_data().is_some() { "LIVE" } else { "LAST" };
                                                     
                                                     rsx! {
-                                                        // Data status indicator (Binance mobile size)
+                                                        // Data status indicator (responsive)
                                                         text { 
-                                                            x: "160", y: "180", 
+                                                            x: if is_mobile() { "160" } else { "140" }, 
+                                                            y: "180", 
                                                             text_anchor: "middle",
-                                                            font_size: "13", 
+                                                            font_size: if is_mobile() { "13" } else { "11" }, 
                                                             font_weight: "bold",
                                                             fill: if hover_data().is_some() { "#02C076" } else { "#848E9C" },
                                                             "● {status} DATA"
                                                         }
                                                         
-                                                        // Price, P&L in columns (Binance mobile optimized)
+                                                        // Price display (responsive font size)
                                                         text { 
                                                             x: "20", y: "210", 
-                                                            font_size: "16", 
+                                                            font_size: if is_mobile() { "16" } else { "14" }, 
                                                             font_weight: "bold",
                                                             fill: "#EAECEF",
                                                             "Price: ${price:.2}"
                                                         }
+                                                        
+                                                        // P&L display (responsive font size)
                                                         text { 
                                                             x: "20", y: "240", 
-                                                            font_size: "16", 
+                                                            font_size: if is_mobile() { "16" } else { "14" }, 
                                                             font_weight: "bold",
                                                             fill: if payoff >= 0.0 { "#02C076" } else { "#F6465D" },
                                                             "P&L: ${payoff:.2}"
                                                         }
+                                                        
+                                                        // Percentage change (responsive font size)
                                                         text { 
                                                             x: "20", y: "270", 
-                                                            font_size: "14", 
+                                                            font_size: if is_mobile() { "14" } else { "12" }, 
                                                             font_weight: "bold",
                                                             fill: if payoff >= 0.0 { "#02C076" } else { "#F6465D" },
                                                             "({percent:+.1}%)"
                                                         }
                                                         
-                                                        // Additional Binance-style info
-                                                        line { x1: "20", y1: "290", x2: "300", y2: "290", stroke: "#474D57", stroke_width: "1" }
+                                                        // Additional Binance-style info separator
+                                                        line { 
+                                                            x1: "20", y1: "290", 
+                                                            x2: if is_mobile() { "300" } else { "260" }, y2: "290", 
+                                                            stroke: "#474D57", stroke_width: "1" 
+                                                        }
                                                         
+                                                        // Portfolio Analysis label
                                                         text { 
                                                             x: "20", y: "315", 
-                                                            font_size: "12", 
+                                                            font_size: if is_mobile() { "12" } else { "10" }, 
                                                             fill: "#848E9C",
                                                             "Portfolio Analysis"
                                                         }
+                                                        
+                                                        // Close instruction (responsive)
                                                         text { 
-                                                            x: "20", y: "335", 
-                                                            font_size: "11", 
+                                                            x: "20", y: if is_mobile() { "335" } else { "330" }, 
+                                                            font_size: if is_mobile() { "11" } else { "9" }, 
                                                             fill: "#848E9C",
-                                                            "Tap outside or double-tap to close"
+                                                            if is_mobile() { "Tap outside or double-tap to close" } else { "Click outside or double-click to close" }
                                                         }
                                                         
-                                                        // Risk indicator
+                                                        // Risk indicator (responsive)
                                                         {
                                                             let risk_color = if payoff < -100.0 { "#F6465D" } 
                                                                              else if payoff > 100.0 { "#02C076" } 
@@ -797,8 +850,9 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                                                            else { "MODERATE" };
                                                             rsx! {
                                                                 text { 
-                                                                    x: "20", y: "365", 
-                                                                    font_size: "11", 
+                                                                    x: "20", 
+                                                                    y: if is_mobile() { "365" } else { "350" }, 
+                                                                    font_size: if is_mobile() { "11" } else { "10" }, 
                                                                     font_weight: "bold",
                                                                     fill: risk_color,
                                                                     "Risk Level: {risk_text}"
@@ -808,134 +862,24 @@ pub fn PayoffChart(props: PayoffChartProps) -> Element {
                                                     }
                                                 }
                                                 
-                                                // Close button (Binance mobile optimized)
+                                                // Close button (responsive positioning)
                                                 circle {
-                                                    cx: "295", cy: "25", r: "15",
-                                                    fill: "#F6465D",
+                                                    cx: if is_mobile() { "295" } else { "255" }, 
+                                                    cy: "25", 
+                                                    r: if is_mobile() { "15" } else { "12" },
+                                                    fill: "#F6465D", // Binance red
                                                     style: "cursor: pointer;",
                                                     onclick: move |_| {
                                                         legend_visible.set(false);
                                                     }
                                                 }
                                                 text {
-                                                    x: "295", y: "32",
+                                                    x: if is_mobile() { "295" } else { "255" }, 
+                                                    y: if is_mobile() { "32" } else { "30" },
                                                     text_anchor: "middle",
-                                                    font_size: "18",
+                                                    font_size: if is_mobile() { "18" } else { "14" },
                                                     fill: "white",
                                                     font_weight: "bold",
-                                                    style: "cursor: pointer; user-select: none;",
-                                                    "×"
-                                                }
-                                            }
-                                        } else if legend_visible() {
-                                            // Desktop legend (original size) - only show when legend_visible is true
-                                            g {
-                                                transform: "translate({legend_position().0}, {legend_position().1})",
-                                                class: "draggable-legend",
-                                                style: "cursor: move;",
-                                                
-                                                // Legend background (expanded to show data)
-                                                rect {
-                                                    x: "0", y: "0", width: "180", height: "120",
-                                                    fill: "rgba(255, 255, 255, 0.95)",
-                                                    stroke: "#dee2e6",
-                                                    stroke_width: "1",
-                                                    rx: "4",
-                                                    style: "filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1));",
-                                                    
-                                                    // Drag events
-                                                    onmousedown: move |evt| {
-                                                        is_dragging.set(true);
-                                                        let rect = evt.client_coordinates();
-                                                        let current_pos = legend_position();
-                                                        drag_offset.set((rect.x as f64 - current_pos.0, rect.y as f64 - current_pos.1));
-                                                    }
-                                                }
-                                                
-                                                // Legend title with drag handle indicator
-                                                text { 
-                                                    x: "90", y: "12", 
-                                                    text_anchor: "middle",
-                                                    font_size: "10", 
-                                                    font_weight: "bold",
-                                                    fill: "#6c757d",
-                                                    "📊 Interactive Legend (Drag Me)"
-                                                }
-                                                
-                                                // Chart legend items
-                                                line { x1: "10", y1: "25", x2: "30", y2: "25", stroke: "#007bff", stroke_width: "3" }
-                                                text { x: "35", y: "29", font_size: "9", fill: "#495057", "Payoff Curve" }
-                                                
-                                                line { x1: "10", y1: "38", x2: "30", y2: "38", stroke: "#ffc107", stroke_width: "3", stroke_dasharray: "4,2" }
-                                                text { x: "35", y: "42", font_size: "9", fill: "#495057", "Break Even" }
-                                                
-                                                circle { cx: "20", cy: "51", r: "3", fill: "#28a745" }
-                                                text { x: "35", y: "55", font_size: "9", fill: "#495057", "Profit Zone" }
-                                                
-                                                circle { cx: "20", cy: "64", r: "3", fill: "#dc3545" }
-                                                text { x: "35", y: "68", font_size: "9", fill: "#495057", "Loss Zone" }
-                                                
-                                                // Separator line
-                                                line { x1: "10", y1: "75", x2: "170", y2: "75", stroke: "#dee2e6", stroke_width: "1" }
-                                                
-                                                // Hover data display section
-                                                {
-                                                    let display_data = if let Some(current_data) = hover_data() {
-                                                        current_data
-                                                    } else {
-                                                        last_hover_data()
-                                                    };
-                                                    
-                                                    let (price, payoff, percent) = display_data;
-                                                    let status = if hover_data().is_some() { "LIVE" } else { "LAST" };
-                                                    
-                                                    rsx! {
-                                                        // Data status indicator
-                                                        text { 
-                                                            x: "90", y: "88", 
-                                                            text_anchor: "middle",
-                                                            font_size: "8", 
-                                                            font_weight: "bold",
-                                                            fill: if hover_data().is_some() { "#28a745" } else { "#6c757d" },
-                                                            "{status} DATA"
-                                                        }
-                                                        
-                                                        // Price display
-                                                        text { 
-                                                            x: "10", y: "100", 
-                                                            font_size: "10", 
-                                                            font_weight: "bold",
-                                                            fill: "#212529",
-                                                            "Price: ${price:.2}"
-                                                        }
-                                                        
-                                                        // P&L display
-                                                        text { 
-                                                            x: "10", y: "112", 
-                                                            font_size: "10", 
-                                                            font_weight: "bold",
-                                                            fill: if payoff >= 0.0 { "#28a745" } else { "#dc3545" },
-                                                            "P&L: ${payoff:.2} ({percent:+.1}%)"
-                                                        }
-                                                    }
-                                                }
-                                                
-                                                // Mini close button to minimize legend
-                                                circle {
-                                                    cx: "170", cy: "10", r: "6",
-                                                    fill: "#f8f9fa",
-                                                    stroke: "#dee2e6",
-                                                    style: "cursor: pointer;",
-                                                    onclick: move |_| {
-                                                        // Move legend to corner when minimized
-                                                        legend_position.set((650.0, 50.0));
-                                                    }
-                                                }
-                                                text {
-                                                    x: "170", y: "13",
-                                                    text_anchor: "middle",
-                                                    font_size: "8",
-                                                    fill: "#6c757d",
                                                     style: "cursor: pointer; user-select: none;",
                                                     "×"
                                                 }
