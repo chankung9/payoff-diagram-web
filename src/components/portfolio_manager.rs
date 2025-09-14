@@ -15,6 +15,7 @@ pub struct PortfolioManagerProps {
 pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
     let mut portfolio_list = use_signal(|| Vec::<PortfolioListItem>::new());
     let mut show_create_form = use_signal(|| false);
+    let mut show_import_dialog = use_signal(|| false);
     let mut error_message = use_signal(|| None::<String>);
     let mut success_message = use_signal(|| None::<String>);
 
@@ -106,6 +107,31 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
         }
     };
 
+    let import_portfolio = move |file_content: String| {
+        match BrowserFileManager::import_portfolio_from_content(&file_content) {
+            Ok(portfolio) => {
+                match LocalStorageManager::save_portfolio(&portfolio) {
+                    Ok(_) => {
+                        props.on_portfolio_change.call(portfolio);
+                        show_import_dialog.set(false);
+                        success_message.set(Some("Portfolio imported successfully".to_string()));
+                        
+                        // Refresh portfolio list
+                        if let Ok(list) = LocalStorageManager::get_portfolio_list() {
+                            portfolio_list.set(list);
+                        }
+                    }
+                    Err(e) => {
+                        error_message.set(Some(format!("Error saving imported portfolio: {}", e)));
+                    }
+                }
+            }
+            Err(e) => {
+                error_message.set(Some(format!("Import error: {}", e)));
+            }
+        }
+    };
+
     // ใช้ use_memo เพื่อป้องกัน borrow conflict
     let current_portfolio_id = use_memo(move || {
         props
@@ -161,6 +187,11 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
                     onclick: move |_| show_create_form.set(true),
                     "📝 Create Portfolio"
                 }
+                button {
+                    class: "action-btn secondary",
+                    onclick: move |_| show_import_dialog.set(true),
+                    "📂 Import Portfolio"
+                }
             }
 
             // Create Form
@@ -169,6 +200,17 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
                     CreatePortfolioForm {
                         on_create: create_portfolio,
                         on_cancel: move |_| show_create_form.set(false),
+                    }
+                },
+                false => rsx! { div {} }
+            }}
+
+            // Import Dialog
+            {match show_import_dialog() {
+                true => rsx! {
+                    ImportPortfolioDialog {
+                        on_import: import_portfolio,
+                        on_cancel: move |_| show_import_dialog.set(false),
                     }
                 },
                 false => rsx! { div {} }
@@ -366,6 +408,74 @@ fn PortfolioCard(props: PortfolioCardProps) -> Element {
                         }
                     },
                     "🗑️ Delete"
+                }
+            }
+        }
+    }
+}
+
+#[derive(Props, Clone, PartialEq)]
+struct ImportPortfolioDialogProps {
+    on_import: EventHandler<String>,
+    on_cancel: EventHandler<()>,
+}
+
+#[component]
+fn ImportPortfolioDialog(props: ImportPortfolioDialogProps) -> Element {
+    let mut is_loading = use_signal(|| false);
+
+    let handle_file_select = move |evt: Event<FormData>| {
+        if let Some(files) = evt.files() {
+            if let Some(file) = files.files().get(0) {
+                is_loading.set(true);
+                let file_name = file.clone();
+                let on_import = props.on_import.clone();
+                
+                spawn(async move {
+                    match files.read_file(&file_name).await {
+                        Some(bytes) => {
+                            let content = String::from_utf8_lossy(&bytes).to_string();
+                            on_import.call(content);
+                        }
+                        None => {
+                            // Error will be handled by parent component
+                        }
+                    }
+                    is_loading.set(false);
+                });
+            }
+        }
+    };
+
+    rsx! {
+        div { class: "import-dialog-overlay",
+            div { class: "import-dialog",
+                h3 { "Import Portfolio" }
+                
+                if is_loading() {
+                    div { class: "loading-state",
+                        div { class: "spinner" }
+                        p { "Importing portfolio..." }
+                    }
+                } else {
+                    div { class: "file-input-container",
+                        input {
+                            r#type: "file",
+                            accept: ".json,.csv",
+                            onchange: handle_file_select
+                        }
+                        div { class: "file-help",
+                            "Select a JSON or CSV file exported from this app"
+                        }
+                    }
+                }
+
+                div { class: "dialog-actions",
+                    button {
+                        class: "action-btn secondary",
+                        onclick: move |_| props.on_cancel.call(()),
+                        "Cancel"
+                    }
                 }
             }
         }
