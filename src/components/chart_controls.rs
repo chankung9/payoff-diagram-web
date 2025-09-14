@@ -22,15 +22,36 @@ pub fn ChartControls(props: ChartControlsProps) -> Element {
         step_size_input.set(props.step_size.to_string());
     });
 
-    let handle_update = move |_| {
-        let start = price_start_input().parse::<f64>().unwrap_or(props.price_start);
-        let end = price_end_input().parse::<f64>().unwrap_or(props.price_end);
-        let step = step_size_input().parse::<f64>().unwrap_or(props.step_size);
-        
-        if start >= 0.0 && end > start && step > 0.0 {
-            props.on_price_range_change.call((start, end));
-            props.on_step_size_change.call(step);
-            props.on_calculate.call(());
+    // Handle realtime updates
+    let mut handle_price_start_change = move |value: String| {
+        price_start_input.set(value.clone());
+        if let Ok(start) = value.parse::<f64>() {
+            let end = props.price_end;
+            if start >= 0.0 && end > start {
+                props.on_price_range_change.call((start, end));
+                props.on_calculate.call(());
+            }
+        }
+    };
+
+    let mut handle_price_end_change = move |value: String| {
+        price_end_input.set(value.clone());
+        if let Ok(end) = value.parse::<f64>() {
+            let start = props.price_start;
+            if start >= 0.0 && end > start {
+                props.on_price_range_change.call((start, end));
+                props.on_calculate.call(());
+            }
+        }
+    };
+
+    let mut handle_step_size_change = move |value: String| {
+        step_size_input.set(value.clone());
+        if let Ok(step) = value.parse::<f64>() {
+            if step > 0.0 {
+                props.on_step_size_change.call(step);
+                props.on_calculate.call(());
+            }
         }
     };
 
@@ -56,7 +77,7 @@ pub fn ChartControls(props: ChartControlsProps) -> Element {
                                 r#type: "number",
                                 step: "0.01",
                                 value: "{price_start_input()}",
-                                oninput: move |e| price_start_input.set(e.value())
+                                oninput: move |e| handle_price_start_change(e.value())
                             }
                         }
                         
@@ -68,7 +89,7 @@ pub fn ChartControls(props: ChartControlsProps) -> Element {
                                 r#type: "number", 
                                 step: "0.01",
                                 value: "{price_end_input()}",
-                                oninput: move |e| price_end_input.set(e.value())
+                                oninput: move |e| handle_price_end_change(e.value())
                             }
                         }
                     }
@@ -87,18 +108,13 @@ pub fn ChartControls(props: ChartControlsProps) -> Element {
                             step: "0.01",
                             min: "0.01",
                             value: "{step_size_input()}",
-                            oninput: move |e| step_size_input.set(e.value())
+                            oninput: move |e| handle_step_size_change(e.value())
                         }
                     }
                 }
                 
                 div {
                     class: "control-section",
-                    button {
-                        class: "btn btn-primary",
-                        onclick: move |e| handle_update(e),
-                        "Update Chart"
-                    }
                     
                     div {
                         class: "chart-info",

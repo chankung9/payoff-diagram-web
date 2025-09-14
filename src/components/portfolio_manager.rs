@@ -171,7 +171,6 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
 
             // Portfolio List
             div { class: "portfolio-list-section",
-                h3 { "Saved Portfolios" }
                 div { class: "portfolio-list",
                 {match portfolio_list.read().is_empty() {
                     true => rsx! {
@@ -180,16 +179,14 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
                         }
                     },
                     false => rsx! {
-                        div {
-                            for item in portfolio_list.read().iter() {
-                                PortfolioCard {
-                                    key: "{item.id}",
-                                    portfolio_item: item.clone(),
-                                    is_current: current_portfolio_id().as_ref() == Some(&item.id),
-                                    on_load: load_portfolio,
-                                    on_export: export_portfolio,
-                                    on_delete: delete_portfolio,
-                                }
+                        for item in portfolio_list.read().iter() {
+                            PortfolioCard {
+                                key: "{item.id}",
+                                portfolio_item: item.clone(),
+                                is_current: current_portfolio_id().as_ref() == Some(&item.id),
+                                on_load: load_portfolio,
+                                on_export: export_portfolio,
+                                on_delete: delete_portfolio,
                             }
                         }
                     }
