@@ -62,7 +62,7 @@
     .svg-chart-wrapper {
         aspect-ratio: 1.8/1;
     }
-    
+
     .chart-tooltip {
         transform: scale(0.8);
     }
@@ -72,7 +72,7 @@
     .svg-chart-wrapper {
         aspect-ratio: 1.6/1;
     }
-    
+
     /* Binance-style mobile legend */
     .mobile-legend {
         --mobile-legend-width: 320px;
@@ -336,16 +336,16 @@
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-    
+
     .position-form-side {
         position: static;
         height: auto;
     }
-    
+
     .chart-section-side {
         order: 2;
     }
-    
+
     .position-form-side {
         order: 2;
     }
@@ -355,16 +355,16 @@
     .app-grid {
         padding: 1rem;
     }
-    
+
     .chart-and-form-section {
         gap: 0.5rem;
     }
-    
+
     .chart-section-side,
     .position-form-side {
         padding: 1rem;
     }
-    
+
     .position-list {
         margin-top: 1rem;
     }
@@ -508,23 +508,23 @@ body {
         text-align: center;
         padding: 1rem;
     }
-    
+
     .header-actions {
         padding: 0;
         justify-content: center;
     }
-    
+
     .current-portfolio-info {
         flex-direction: column;
         text-align: center;
         gap: 0.5rem;
     }
-    
+
     .welcome-content {
         padding: 2rem 1.5rem;
         margin: 1rem;
     }
-    
+
     .welcome-content h2 {
         font-size: 1.5rem;
     }
@@ -648,16 +648,16 @@ body {
         max-width: 1800px;
         padding: 2.5rem;
     }
-    
+
     .chart-section-full {
         padding: 2.5rem;
         min-height: 600px;
     }
-    
+
     .chart-section-full .payoff-chart-svg {
         height: 550px;
     }
-    
+
     .app-grid-bottom {
         grid-template-columns: 1.2fr 0.8fr; /* Give more space to positions */
         gap: 3rem;
@@ -668,7 +668,7 @@ body {
     .chart-section-full .payoff-chart-svg {
         height: 650px;
     }
-    
+
     .chart-section-full {
         min-height: 700px;
     }
@@ -1262,23 +1262,23 @@ body {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
-    
+
     .app-grid {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
-    
+
     .controls-grid {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-    
+
     /* Chart stays full width on tablets */
     .chart-section-full {
         padding: 1.5rem;
         min-height: 400px;
     }
-    
+
     .chart-section-full .payoff-chart-svg {
         height: 380px;
     }
@@ -1288,16 +1288,16 @@ body {
     .app-header {
         padding: 1.5rem 1rem;
     }
-    
+
     .app-header h1 {
         font-size: 2rem;
     }
-    
+
     .app-main {
         padding: 1rem;
         gap: 1.5rem;
     }
-    
+
     /* Mobile: Stack chart and form vertically with specific order */
     .chart-and-form-section {
         display: flex !important;
@@ -1305,68 +1305,68 @@ body {
         gap: 1.5rem;
         margin-bottom: 1.5rem;
     }
-    
+
     /* Mobile: Chart shows first */
     .mobile-order-1 {
         order: 1;
     }
-    
+
     /* Mobile: Position form shows second */
     .mobile-order-2 {
         order: 2;
     }
-    
+
     /* Mobile: Position list and controls show last */
     .mobile-order-3 {
         order: 3;
     }
-    
+
     /* Mobile: Chart section adjustments */
     .chart-section-side {
         padding: 1rem;
         min-height: 350px;
     }
-    
+
     .chart-section-side .payoff-chart-svg {
         height: 320px;
     }
-    
+
     .chart-section-full {
         padding: 1rem;
         min-height: 350px;
         order: 1; /* Chart shows first */
     }
-    
+
     .chart-section-full .payoff-chart-svg {
         height: 320px;
     }
-    
+
     /* Mobile: Position form styling */
     .position-form-side {
         position: static; /* Remove sticky positioning on mobile */
         margin-bottom: 1.5rem;
         min-height: auto;
     }
-    
+
     /* Mobile: Bottom grid stacks vertically */
     .app-grid-bottom {
         grid-template-columns: 1fr;
         gap: 1.5rem;
     }
-    
+
     .form-row {
         grid-template-columns: 1fr;
         gap: 0.75rem;
     }
-    
+
     .form-actions {
         flex-direction: column;
     }
-    
+
     .stat-grid {
         grid-template-columns: 1fr 1fr;
     }
-    
+
     .summary-stats {
         grid-template-columns: 1fr;
     }
@@ -1376,16 +1376,16 @@ body {
     .app-header h1 {
         font-size: 1.5rem;
     }
-    
+
     .section {
         padding: 1rem;
     }
-    
+
     .range-buttons,
     .step-buttons {
         justify-content: center;
     }
-    
+
     .stat-grid {
         grid-template-columns: 1fr;
     }
@@ -1738,17 +1738,17 @@ body {
     .portfolio-manager {
         padding: 0.5rem;
     }
-    
+
     .portfolio-manager-content {
         padding: 1rem;
         max-height: 95vh;
     }
-    
+
     .portfolio-list {
         flex-direction: column !important;
         gap: 1rem !important;
     }
-    
+
     .portfolio-card {
         flex: 1 1 100% !important;
         min-width: auto !important;
@@ -1756,11 +1756,11 @@ body {
         min-height: 140px;
         padding: 1rem;
     }
-    
+
     .portfolio-actions {
         gap: 0.5rem;
     }
-    
+
     .action-btn.primary,
     .action-btn.danger {
         padding: 0.375rem 0.5rem;
@@ -2016,11 +2016,11 @@ body {
 }
 
 @keyframes slideUp {
-    from { 
+    from {
         opacity: 0;
         transform: translateY(30px) scale(0.95);
     }
-    to { 
+    to {
         opacity: 1;
         transform: translateY(0) scale(1);
     }
@@ -2189,28 +2189,28 @@ body {
         gap: 1rem;
         align-items: stretch;
     }
-    
+
     .portfolio-actions {
         justify-content: center;
     }
-    
+
     .portfolio-card-header {
         flex-direction: column;
         align-items: stretch;
         gap: 0.5rem;
     }
-    
+
     .portfolio-meta {
         flex-direction: column;
         gap: 0.25rem;
         align-items: flex-start;
     }
-    
+
     .dialog {
         width: 95%;
         margin: 1rem;
     }
-    
+
     .dialog-footer {
         flex-direction: column;
     }

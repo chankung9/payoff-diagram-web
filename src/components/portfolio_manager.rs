@@ -115,7 +115,7 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
                         props.on_portfolio_change.call(portfolio);
                         show_import_dialog.set(false);
                         success_message.set(Some("Portfolio imported successfully".to_string()));
-                        
+
                         // Refresh portfolio list
                         if let Ok(list) = LocalStorageManager::get_portfolio_list() {
                             portfolio_list.set(list);
@@ -430,7 +430,7 @@ fn ImportPortfolioDialog(props: ImportPortfolioDialogProps) -> Element {
                 is_loading.set(true);
                 let file_name = file.clone();
                 let on_import = props.on_import.clone();
-                
+
                 spawn(async move {
                     match files.read_file(&file_name).await {
                         Some(bytes) => {
@@ -451,7 +451,7 @@ fn ImportPortfolioDialog(props: ImportPortfolioDialogProps) -> Element {
         div { class: "import-dialog-overlay",
             div { class: "import-dialog",
                 h3 { "Import Portfolio" }
-                
+
                 if is_loading() {
                     div { class: "loading-state",
                         div { class: "spinner" }
