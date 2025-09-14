@@ -27,6 +27,51 @@ pub struct Portfolio {
     pub sync_metadata: SyncMetadata,
 }
 
+impl Portfolio {
+    pub fn new(name: String, description: String) -> Self {
+        let now = chrono::Utc::now();
+        Self {
+            id: uuid::Uuid::new_v4().to_string(),
+            name,
+            description: Some(description),
+            created_at: now,
+            updated_at: now,
+            version: "1.0.0".to_string(),
+            positions: Vec::new(),
+            settings: PortfolioSettings::default(),
+            tags: Vec::new(),
+            storage_metadata: StorageMetadata::default(),
+            sync_metadata: SyncMetadata::default(),
+        }
+    }
+
+    pub fn add_position(&mut self, position: crate::models::Position) {
+        let enhanced_position = EnhancedPosition {
+            id: uuid::Uuid::new_v4().to_string(),
+            position,
+            metadata: PositionMetadata {
+                created_at: chrono::Utc::now(),
+                updated_at: chrono::Utc::now(),
+                source: PositionSource::Manual,
+                tags: Vec::new(),
+                notes: None,
+                external_id: None,
+            },
+        };
+        self.positions.push(enhanced_position);
+        self.update_timestamp();
+    }
+
+    pub fn update_timestamp(&mut self) {
+        self.updated_at = chrono::Utc::now();
+    }
+
+    // Compatibility field for last_modified
+    pub fn last_modified(&self) -> chrono::DateTime<chrono::Utc> {
+        self.updated_at
+    }
+}
+
 // === Enhanced Position Model ===
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EnhancedPosition {
