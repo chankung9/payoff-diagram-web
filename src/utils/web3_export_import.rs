@@ -2,9 +2,11 @@
 // This module provides comprehensive data export/import functionality
 // with support for multiple formats, encryption, and metadata preservation
 
-use serde_json;
+use crate::models::{
+    DataExchangeFormat, ExportFormat, ExternalDataSource, Portfolio, Position, PositionTemplate,
+};
 use chrono::Utc;
-use crate::models::{Position, Portfolio, DataExchangeFormat, ExportFormat, PositionTemplate, ExternalDataSource};
+use serde_json;
 
 // === Enhanced Export Functions ===
 pub mod export {
@@ -18,7 +20,7 @@ pub mod export {
             exported_by: format!("payoff-diagram-web-{}", env!("CARGO_PKG_VERSION")),
             checksum: None, // TODO: Implement checksums
             portfolios: vec![portfolio.clone()],
-            templates: Vec::new(), // TODO: Load user templates
+            templates: Vec::new(),        // TODO: Load user templates
             external_sources: Vec::new(), // TODO: Load external sources
             includes_settings: true,
             includes_metadata: true,
@@ -31,14 +33,13 @@ pub mod export {
 
     /// Export only positions (legacy format for backward compatibility)
     pub fn export_positions_only(positions: &[Position]) -> Result<String, String> {
-        serde_json::to_string_pretty(positions)
-            .map_err(|e| format!("Position export error: {}", e))
+        serde_json::to_string_pretty(positions).map_err(|e| format!("Position export error: {}", e))
     }
 
     /// Export portfolio to specific format
     pub fn export_portfolio_format(
-        portfolio: &Portfolio, 
-        format: ExportFormat
+        portfolio: &Portfolio,
+        format: ExportFormat,
     ) -> Result<String, String> {
         match format {
             ExportFormat::JSON => export_portfolio_complete(portfolio),
@@ -57,15 +58,15 @@ pub mod export {
     /// Export to CSV format (positions only)
     fn export_to_csv(portfolio: &Portfolio) -> Result<String, String> {
         let mut csv_content = String::new();
-        
+
         // CSV Header
         csv_content.push_str("ID,Type,Quantity,Entry_Price,Strike_Price,Premium,Contract_Size,Description,Active,Created_At,Tags\n");
-        
+
         // CSV Data
         for enhanced_pos in &portfolio.positions {
             let pos = &enhanced_pos.position;
             let meta = &enhanced_pos.metadata;
-            
+
             let row = match pos {
                 Position::Spot(spot) => format!(
                     "{},Spot,{},{},,,,,\"{}\",{},{},\"{}\"\n",
@@ -103,19 +104,19 @@ pub mod export {
             };
             csv_content.push_str(&row);
         }
-        
+
         Ok(csv_content)
     }
 
     /// Generate file download content with proper MIME type
     pub fn generate_download_content(
         portfolio: &Portfolio,
-        format: ExportFormat
+        format: ExportFormat,
     ) -> Result<(String, String, String), String> {
         let content = export_portfolio_format(portfolio, format.clone())?;
         let filename = generate_filename(&portfolio.name, &format);
         let mime_type = get_mime_type(&format);
-        
+
         Ok((content, filename, mime_type))
     }
 
@@ -125,7 +126,7 @@ pub mod export {
             .chars()
             .filter(|c| c.is_alphanumeric() || *c == '_' || *c == '-')
             .collect::<String>();
-        
+
         match format {
             ExportFormat::JSON => format!("{}_{}.json", clean_name, timestamp),
             ExportFormat::CSV => format!("{}_{}.csv", clean_name, timestamp),
@@ -138,7 +139,9 @@ pub mod export {
         match format {
             ExportFormat::JSON => "application/json".to_string(),
             ExportFormat::CSV => "text/csv".to_string(),
-            ExportFormat::Excel => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet".to_string(),
+            ExportFormat::Excel => {
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet".to_string()
+            }
             ExportFormat::PDF => "application/pdf".to_string(),
         }
     }
@@ -156,13 +159,14 @@ pub mod import {
         // Validate format version
         if !is_compatible_version(&exchange_format.format_version) {
             return Err(format!(
-                "Incompatible format version: {}. Expected 1.x.x", 
+                "Incompatible format version: {}. Expected 1.x.x",
                 exchange_format.format_version
             ));
         }
 
         // Extract first portfolio (for now, support single portfolio)
-        exchange_format.portfolios
+        exchange_format
+            .portfolios
             .into_iter()
             .next()
             .ok_or_else(|| "No portfolios found in import data".to_string())
@@ -170,8 +174,7 @@ pub mod import {
 
     /// Import positions only (legacy format)
     pub fn import_positions_only(json_data: &str) -> Result<Vec<Position>, String> {
-        serde_json::from_str(json_data)
-            .map_err(|e| format!("Position import error: {}", e))
+        serde_json::from_str(json_data).map_err(|e| format!("Position import error: {}", e))
     }
 
     /// Smart import - detect format automatically
@@ -198,7 +201,7 @@ pub mod import {
     pub fn import_from_csv(csv_data: &str) -> Result<Vec<Position>, String> {
         let mut positions = Vec::new();
         let lines: Vec<&str> = csv_data.lines().collect();
-        
+
         if lines.is_empty() {
             return Err("Empty CSV data".to_string());
         }
@@ -211,7 +214,7 @@ pub mod import {
 
             let position = parse_csv_line(line)
                 .map_err(|e| format!("Error on line {}: {}", line_num + 2, e))?;
-            
+
             positions.push(position);
         }
 
@@ -220,32 +223,32 @@ pub mod import {
 
     fn parse_csv_line(line: &str) -> Result<Position, String> {
         let fields: Vec<&str> = line.split(',').collect();
-        
+
         if fields.len() < 9 {
             return Err("Insufficient fields in CSV line".to_string());
         }
 
         let position_type = fields[1].trim();
-        let quantity: f64 = fields[2].trim().parse()
-            .map_err(|_| "Invalid quantity")?;
-        let entry_price: f64 = fields[3].trim().parse()
+        let quantity: f64 = fields[2].trim().parse().map_err(|_| "Invalid quantity")?;
+        let entry_price: f64 = fields[3]
+            .trim()
+            .parse()
             .map_err(|_| "Invalid entry price")?;
         let description = fields[8].trim().trim_matches('"').to_string();
 
         match position_type {
-            "Spot" => {
-                Ok(Position::Spot(crate::models::SpotPosition::new(
-                    quantity,
-                    entry_price,
-                    Some(description),
-                )))
-            },
+            "Spot" => Ok(Position::Spot(crate::models::SpotPosition::new(
+                quantity,
+                entry_price,
+                Some(description),
+            ))),
             "Option" => {
-                let strike_price: f64 = fields[4].trim().parse()
+                let strike_price: f64 = fields[4]
+                    .trim()
+                    .parse()
                     .map_err(|_| "Invalid strike price")?;
-                let premium: f64 = fields[5].trim().parse()
-                    .map_err(|_| "Invalid premium")?;
-                
+                let premium: f64 = fields[5].trim().parse().map_err(|_| "Invalid premium")?;
+
                 // Default to Call for now - CSV format could be enhanced
                 Ok(Position::Option(crate::models::OptionPosition::new(
                     crate::models::OptionType::Call,
@@ -254,18 +257,20 @@ pub mod import {
                     premium,
                     Some(description),
                 )))
-            },
+            }
             "Futures" => {
-                let contract_size: f64 = fields[6].trim().parse()
+                let contract_size: f64 = fields[6]
+                    .trim()
+                    .parse()
                     .map_err(|_| "Invalid contract size")?;
-                
+
                 Ok(Position::Futures(crate::models::FuturesPosition::new(
                     quantity,
                     entry_price,
                     contract_size,
                     Some(description),
                 )))
-            },
+            }
             _ => Err(format!("Unknown position type: {}", position_type)),
         }
     }
@@ -296,7 +301,7 @@ pub mod import {
                     if spot.entry_price <= 0.0 {
                         errors.push(format!("Position {}: Invalid entry price", index + 1));
                     }
-                },
+                }
                 Position::Option(opt) => {
                     if opt.strike_price <= 0.0 {
                         errors.push(format!("Position {}: Invalid strike price", index + 1));
@@ -304,7 +309,7 @@ pub mod import {
                     if opt.premium < 0.0 {
                         errors.push(format!("Position {}: Invalid premium", index + 1));
                     }
-                },
+                }
                 Position::Futures(fut) => {
                     if fut.entry_price <= 0.0 {
                         errors.push(format!("Position {}: Invalid entry price", index + 1));
@@ -312,7 +317,7 @@ pub mod import {
                     if fut.contract_size <= 0.0 {
                         errors.push(format!("Position {}: Invalid contract size", index + 1));
                     }
-                },
+                }
             }
         }
 
@@ -361,7 +366,7 @@ pub mod file_utils {
         let base_size = 1024; // Base JSON structure
         let position_size = portfolio.positions.len() * 512; // ~512 bytes per position
         let metadata_size = 2048; // Settings and metadata
-        
+
         base_size + position_size + metadata_size
     }
 }

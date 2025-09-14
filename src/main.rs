@@ -1,9 +1,9 @@
 use dioxus::prelude::*;
 
 mod components;
+mod engine;
 mod models;
 mod utils;
-mod engine;
 
 const MAIN_CSS: Asset = asset!("/assets/main.css");
 

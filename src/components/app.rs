@@ -1,16 +1,16 @@
+use crate::components::{ChartControls, PayoffChart, PortfolioManager, PositionForm, PositionList};
+use crate::models::{Portfolio, Position};
+use crate::utils::{AppSettings, LocalStorageManager};
 use dioxus::prelude::*;
-use crate::models::{Position, Portfolio};
-use crate::components::{PositionForm, PositionList, ChartControls, PayoffChart, PortfolioManager};
-use crate::utils::{LocalStorageManager, AppSettings};
 
 pub fn App() -> Element {
     // Portfolio management state
     let mut current_portfolio = use_signal(|| None::<Portfolio>);
     let mut show_portfolio_manager = use_signal(|| false);
     let mut app_settings = use_signal(|| AppSettings::default());
-    
+
     // Chart state (derived from current portfolio)
-    let mut price_start = use_signal(|| 0.0);    
+    let mut price_start = use_signal(|| 0.0);
     let mut price_end = use_signal(|| 300.0);
 
     // Load app on startup
@@ -57,12 +57,15 @@ pub fn App() -> Element {
     let auto_save_effect = use_resource(move || {
         let settings = app_settings();
         let portfolio = current_portfolio();
-        
+
         async move {
             if settings.auto_save_enabled {
                 if let Some(portfolio) = portfolio {
                     // Auto-save every 30 seconds
-                    gloo_timers::future::sleep(std::time::Duration::from_secs(settings.auto_save_interval)).await;
+                    gloo_timers::future::sleep(std::time::Duration::from_secs(
+                        settings.auto_save_interval,
+                    ))
+                    .await;
                     let _ = LocalStorageManager::auto_save_portfolio(&portfolio);
                 }
             }
@@ -72,7 +75,12 @@ pub fn App() -> Element {
     // Get current positions from portfolio
     let positions = use_memo(move || {
         current_portfolio()
-            .map(|p| p.positions.iter().map(|ep| ep.position.clone()).collect::<Vec<Position>>())
+            .map(|p| {
+                p.positions
+                    .iter()
+                    .map(|ep| ep.position.clone())
+                    .collect::<Vec<Position>>()
+            })
             .unwrap_or_default()
     });
 
@@ -82,10 +90,10 @@ pub fn App() -> Element {
         if pos.is_empty() {
             return (0.0, 300.0);
         }
-        
+
         let mut min_relevant = f64::INFINITY;
         let mut max_relevant = f64::NEG_INFINITY;
-        
+
         for position in pos {
             match position {
                 Position::Option(ref option) => {
@@ -106,11 +114,11 @@ pub fn App() -> Element {
                 }
             }
         }
-        
+
         // Ensure minimum range and floor at 0
         let start = (min_relevant.max(0.0)).max(0.0);
         let end = max_relevant.max(start + 100.0);
-        
+
         (start, end)
     });
 
@@ -173,7 +181,7 @@ pub fn App() -> Element {
     rsx! {
         div {
             class: "app-container",
-            
+
             // Portfolio Manager Dialog
             if show_portfolio_manager() {
                 PortfolioManager {
@@ -190,7 +198,7 @@ pub fn App() -> Element {
                     on_close: handle_portfolio_manager_close
                 }
             }
-            
+
             header {
                 class: "app-header",
                 div {
@@ -198,7 +206,7 @@ pub fn App() -> Element {
                     h1 { "Payoff Diagram Web Application" }
                     p { "Create and visualize payoff diagrams for financial positions" }
                 }
-                
+
                 div {
                     class: "header-actions",
                     if let Some(portfolio) = current_portfolio() {
@@ -220,16 +228,16 @@ pub fn App() -> Element {
                     }
                 }
             }
-            
+
             // Only show main content if a portfolio is selected
             if current_portfolio().is_some() {
                 main {
                     class: "app-main",
-                
+
                 // Chart and Position Form - Side by Side on Desktop, Stacked on Mobile
                 div {
                     class: "chart-and-form-section responsive-layout",
-                    
+
                     // Chart Section - 9/12 width on desktop, full width on mobile (order: 1)
                     div {
                         class: "section chart-section-side mobile-order-1",
@@ -240,7 +248,7 @@ pub fn App() -> Element {
                             step_size: step_size()
                         }
                     }
-                    
+
                     // Position Form - 3/12 width on desktop, full width on mobile (order: 2)
                     div {
                         class: "section position-form-side mobile-order-2",
@@ -249,15 +257,15 @@ pub fn App() -> Element {
                         }
                     }
                 }
-                
+
                 // Position List and Chart Controls - Grid Layout Below (order: 3 on mobile)
                 div {
                     class: "app-grid-bottom mobile-order-3",
-                    
+
                     // Left Column: Position List Only
                     div {
                         class: "left-column",
-                        
+
                         div {
                             class: "section position-list-section",
                             PositionList {
@@ -294,11 +302,11 @@ pub fn App() -> Element {
                             }
                         }
                     }
-                    
+
                     // Right Column: Chart Controls Only
                     div {
                         class: "right-column",
-                        
+
                         div {
                             class: "section chart-controls-section",
                             ChartControls {
@@ -320,7 +328,7 @@ pub fn App() -> Element {
                         }
                     }
                 }
-                
+
                 // Footer with helpful information
                 div {
                     class: "app-info",
@@ -337,14 +345,14 @@ pub fn App() -> Element {
                                 li { "Adjust the price range and resolution as needed" }
                                 li { "Click 'Calculate Payoff Diagram' to see the results" }
                             }
-                            
+
                             h4 { "Position Types:" }
                             ul {
                                 li { strong { "Spot: " } "Direct ownership of an asset (stocks, commodities, etc.)" }
                                 li { strong { "Option: " } "Call or Put options with strike price and premium" }
                                 li { strong { "Futures: " } "Futures contracts with contract size multiplier" }
                             }
-                            
+
                             h4 { "Tips:" }
                             ul {
                                 li { "Use negative quantities for short positions" }
@@ -372,7 +380,7 @@ pub fn App() -> Element {
                     }
                 }
             }
-            
+
             footer {
                 class: "app-footer",
                 p { "Built with Rust + Dioxus + WebAssembly | © 2025 Payoff Diagram Web" }

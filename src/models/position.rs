@@ -26,32 +26,32 @@ pub enum Position {
 /// Spot position (direct ownership of underlying asset)
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SpotPosition {
-    pub quantity: f64,          // Number of units (positive = long, negative = short)
-    pub entry_price: f64,       // Price at which position was entered
-    pub description: String,    // Optional description
-    pub active: bool,           // Whether position is active (included in calculations)
+    pub quantity: f64,       // Number of units (positive = long, negative = short)
+    pub entry_price: f64,    // Price at which position was entered
+    pub description: String, // Optional description
+    pub active: bool,        // Whether position is active (included in calculations)
 }
 
 /// Option position (Call or Put)
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct OptionPosition {
-    pub option_type: OptionType,    // Call or Put
-    pub quantity: f64,              // Number of contracts (positive = long, negative = short)
-    pub strike_price: f64,          // Strike price of the option
-    pub premium: f64,               // Premium paid/received per contract
-    pub expiry_price: f64,          // Current price at expiry (for calculation)
-    pub description: String,        // Optional description
-    pub active: bool,               // Whether position is active (included in calculations)
+    pub option_type: OptionType, // Call or Put
+    pub quantity: f64,           // Number of contracts (positive = long, negative = short)
+    pub strike_price: f64,       // Strike price of the option
+    pub premium: f64,            // Premium paid/received per contract
+    pub expiry_price: f64,       // Current price at expiry (for calculation)
+    pub description: String,     // Optional description
+    pub active: bool,            // Whether position is active (included in calculations)
 }
 
 /// Futures position
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct FuturesPosition {
-    pub quantity: f64,          // Number of contracts (positive = long, negative = short)
-    pub entry_price: f64,       // Price at which futures was entered
-    pub contract_size: f64,     // Size of each contract (multiplier)
-    pub description: String,    // Optional description
-    pub active: bool,           // Whether position is active (included in calculations)
+    pub quantity: f64,       // Number of contracts (positive = long, negative = short)
+    pub entry_price: f64,    // Price at which futures was entered
+    pub contract_size: f64,  // Size of each contract (multiplier)
+    pub description: String, // Optional description
+    pub active: bool,        // Whether position is active (included in calculations)
 }
 
 impl Position {
@@ -119,7 +119,7 @@ impl SpotPosition {
                 let direction = if quantity >= 0.0 { "Long" } else { "Short" };
                 format!("{} {} units @ {}", direction, quantity.abs(), entry_price)
             }),
-            active: true,  // Default to active
+            active: true, // Default to active
         }
     }
 }
@@ -144,10 +144,16 @@ impl OptionPosition {
                     OptionType::Call => "Call",
                     OptionType::Put => "Put",
                 };
-                format!("{} {} {} @ Strike {} Premium {}", 
-                    direction, quantity.abs(), opt_type, strike_price, premium)
+                format!(
+                    "{} {} {} @ Strike {} Premium {}",
+                    direction,
+                    quantity.abs(),
+                    opt_type,
+                    strike_price,
+                    premium
+                )
             }),
-            active: true,  // Default to active
+            active: true, // Default to active
         }
     }
 }
@@ -165,10 +171,15 @@ impl FuturesPosition {
             contract_size,
             description: description.unwrap_or_else(|| {
                 let direction = if quantity >= 0.0 { "Long" } else { "Short" };
-                format!("{} {} Futures @ {} (Size: {})", 
-                    direction, quantity.abs(), entry_price, contract_size)
+                format!(
+                    "{} {} Futures @ {} (Size: {})",
+                    direction,
+                    quantity.abs(),
+                    entry_price,
+                    contract_size
+                )
             }),
-            active: true,  // Default to active
+            active: true, // Default to active
         }
     }
 }

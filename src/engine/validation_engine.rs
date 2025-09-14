@@ -1,4 +1,4 @@
-use crate::models::{Position, SpotPosition, OptionPosition, FuturesPosition};
+use crate::models::{FuturesPosition, OptionPosition, Position, SpotPosition};
 
 /// Validation result for position inputs
 #[derive(Debug, Clone, PartialEq)]
@@ -10,11 +10,7 @@ pub struct ValidationResult {
 
 impl ValidationResult {
     pub fn new() -> Self {
-        Self {
-            is_valid: true,
-            errors: Vec::new(),
-            warnings: Vec::new(),
-        }
+        Self { is_valid: true, errors: Vec::new(), warnings: Vec::new() }
     }
 
     pub fn add_error(&mut self, error: String) {
@@ -60,11 +56,11 @@ impl ValidationEngine {
         // Validate each position
         for (i, position) in positions.iter().enumerate() {
             let pos_result = Self::validate_position(position);
-            
+
             for error in pos_result.errors {
                 result.add_error(format!("Position {}: {}", i + 1, error));
             }
-            
+
             for warning in pos_result.warnings {
                 result.add_warning(format!("Position {}: {}", i + 1, warning));
             }
@@ -178,13 +174,16 @@ impl ValidationEngine {
 
     fn validate_portfolio_risk(positions: &[Position], result: &mut ValidationResult) {
         // Check for excessive leverage
-        let total_notional = positions.iter().map(|pos| {
-            match pos {
+        let total_notional = positions
+            .iter()
+            .map(|pos| match pos {
                 Position::Spot(spot) => spot.quantity.abs() * spot.entry_price,
                 Position::Option(option) => option.quantity.abs() * option.strike_price,
-                Position::Futures(futures) => futures.quantity.abs() * futures.entry_price * futures.contract_size,
-            }
-        }).sum::<f64>();
+                Position::Futures(futures) => {
+                    futures.quantity.abs() * futures.entry_price * futures.contract_size
+                }
+            })
+            .sum::<f64>();
 
         if total_notional > 1_000_000.0 {
             result.add_warning("Portfolio has very large notional exposure".to_string());
@@ -192,7 +191,9 @@ impl ValidationEngine {
 
         // Check for portfolio complexity
         if positions.len() > 10 {
-            result.add_warning("Complex portfolio with many positions - consider simplification".to_string());
+            result.add_warning(
+                "Complex portfolio with many positions - consider simplification".to_string(),
+            );
         }
     }
 }
@@ -212,7 +213,7 @@ mod tests {
     fn test_valid_spot_position() {
         let spot = SpotPosition::new(100.0, 50.0, None);
         let position = Position::Spot(spot);
-        
+
         let result = ValidationEngine::validate_position(&position);
         assert!(result.is_ok());
     }
@@ -221,7 +222,7 @@ mod tests {
     fn test_invalid_spot_position() {
         let spot = SpotPosition::new(0.0, -10.0, None); // Invalid quantity and price
         let position = Position::Spot(spot);
-        
+
         let result = ValidationEngine::validate_position(&position);
         assert!(!result.is_ok());
         assert_eq!(result.errors.len(), 2);

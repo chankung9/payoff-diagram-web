@@ -59,14 +59,14 @@ pub fn ChartControls(props: ChartControlsProps) -> Element {
         div {
             class: "chart-controls",
             h3 { "Chart Settings" }
-            
+
             div {
                 class: "controls-grid",
-                
+
                 div {
                     class: "control-section",
                     h4 { "Price Range" }
-                    
+
                     div {
                         class: "range-inputs",
                         div {
@@ -80,13 +80,13 @@ pub fn ChartControls(props: ChartControlsProps) -> Element {
                                 oninput: move |e| handle_price_start_change(e.value())
                             }
                         }
-                        
+
                         div {
                             class: "form-group",
                             label { "End Price" }
                             input {
                                 class: "form-control",
-                                r#type: "number", 
+                                r#type: "number",
                                 step: "0.01",
                                 value: "{price_end_input()}",
                                 oninput: move |e| handle_price_end_change(e.value())
@@ -94,11 +94,11 @@ pub fn ChartControls(props: ChartControlsProps) -> Element {
                         }
                     }
                 }
-                
+
                 div {
                     class: "control-section",
                     h4 { "Resolution" }
-                    
+
                     div {
                         class: "form-group",
                         label { "Step Size" }
@@ -112,10 +112,10 @@ pub fn ChartControls(props: ChartControlsProps) -> Element {
                         }
                     }
                 }
-                
+
                 div {
                     class: "control-section",
-                    
+
                     div {
                         class: "chart-info",
                         small {

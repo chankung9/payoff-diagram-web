@@ -1,5 +1,5 @@
-use dioxus::prelude::*;
 use crate::models::Position;
+use dioxus::prelude::*;
 
 /// Position direction (Long or Short)
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -13,7 +13,7 @@ pub struct PositionListProps {
     pub positions: Vec<Position>,
     pub on_remove_position: EventHandler<usize>,
     pub on_update_position: EventHandler<(usize, Position)>, // New: for updating positions
-    pub on_toggle_position: EventHandler<usize>, // New: for toggling active state
+    pub on_toggle_position: EventHandler<usize>,             // New: for toggling active state
     pub on_clear_all: EventHandler<()>,
 }
 
@@ -32,7 +32,7 @@ pub fn PositionList(props: PositionListProps) -> Element {
                     }
                 }
             }
-            
+
             if props.positions.is_empty() {
                 div {
                     class: "empty-state",
@@ -52,7 +52,7 @@ pub fn PositionList(props: PositionListProps) -> Element {
                         }
                     }
                 }
-                
+
                 div {
                     class: "position-summary",
                     h4 { "Portfolio Summary" }
@@ -66,25 +66,25 @@ pub fn PositionList(props: PositionListProps) -> Element {
                         div {
                             class: "stat-item",
                             span { class: "stat-label", "Spot Positions:" }
-                            span { 
-                                class: "stat-value", 
-                                "{props.positions.iter().filter(|p| matches!(p, Position::Spot(_))).count()}" 
+                            span {
+                                class: "stat-value",
+                                "{props.positions.iter().filter(|p| matches!(p, Position::Spot(_))).count()}"
                             }
                         }
                         div {
                             class: "stat-item",
                             span { class: "stat-label", "Option Positions:" }
-                            span { 
-                                class: "stat-value", 
-                                "{props.positions.iter().filter(|p| matches!(p, Position::Option(_))).count()}" 
+                            span {
+                                class: "stat-value",
+                                "{props.positions.iter().filter(|p| matches!(p, Position::Option(_))).count()}"
                             }
                         }
                         div {
                             class: "stat-item",
                             span { class: "stat-label", "Futures Positions:" }
-                            span { 
-                                class: "stat-value", 
-                                "{props.positions.iter().filter(|p| matches!(p, Position::Futures(_))).count()}" 
+                            span {
+                                class: "stat-value",
+                                "{props.positions.iter().filter(|p| matches!(p, Position::Futures(_))).count()}"
                             }
                         }
                     }
@@ -100,13 +100,13 @@ pub struct PositionCardProps {
     pub index: usize,
     pub on_remove: EventHandler<usize>,
     pub on_update: EventHandler<(usize, Position)>, // New: for updating positions
-    pub on_toggle: EventHandler<usize>, // New: for toggling active state
+    pub on_toggle: EventHandler<usize>,             // New: for toggling active state
 }
 
 pub fn PositionCard(props: PositionCardProps) -> Element {
     // Edit mode state
     let mut is_editing = use_signal(|| false);
-    
+
     // Editable fields state
     let mut edit_quantity = use_signal(|| props.position.quantity().abs()); // Always positive for editing
     let mut edit_direction = use_signal(|| {
@@ -129,16 +129,16 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
 
     // Clone position to avoid ownership issues
     let position_clone = props.position.clone();
-    
+
     // Reset edit fields when entering edit mode
     let mut enter_edit_mode = {
         let pos = position_clone.clone();
         move || {
             edit_quantity.set(pos.quantity().abs());
-            edit_direction.set(if pos.quantity() >= 0.0 { 
-                PositionDirection::Long 
-            } else { 
-                PositionDirection::Short 
+            edit_direction.set(if pos.quantity() >= 0.0 {
+                PositionDirection::Long
+            } else {
+                PositionDirection::Short
             });
             edit_entry_price.set(match &pos {
                 Position::Spot(spot) => spot.entry_price,
@@ -163,7 +163,7 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
                 PositionDirection::Long => edit_quantity(),
                 PositionDirection::Short => -edit_quantity(),
             };
-            
+
             let updated_position = match &pos {
                 Position::Spot(_) => {
                     use crate::models::SpotPosition;
@@ -197,7 +197,7 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
                     })
                 }
             };
-            
+
             props.on_update.call((props.index, updated_position));
             is_editing.set(false);
         }
@@ -208,8 +208,16 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
     };
     let (position_type_class, position_info, direction_class) = match &position_clone {
         Position::Spot(spot) => {
-            let direction = if spot.quantity >= 0.0 { "Long" } else { "Short" };
-            let direction_class = if spot.quantity >= 0.0 { "long" } else { "short" };
+            let direction = if spot.quantity >= 0.0 {
+                "Long"
+            } else {
+                "Short"
+            };
+            let direction_class = if spot.quantity >= 0.0 {
+                "long"
+            } else {
+                "short"
+            };
             let info = format!(
                 "{} {} units @ ${:.2}",
                 direction,
@@ -219,8 +227,16 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
             ("spot-position", info, direction_class)
         }
         Position::Option(option) => {
-            let direction = if option.quantity >= 0.0 { "Long" } else { "Short" };
-            let direction_class = if option.quantity >= 0.0 { "long" } else { "short" };
+            let direction = if option.quantity >= 0.0 {
+                "Long"
+            } else {
+                "Short"
+            };
+            let direction_class = if option.quantity >= 0.0 {
+                "long"
+            } else {
+                "short"
+            };
             let option_type = match option.option_type {
                 crate::models::OptionType::Call => "Call",
                 crate::models::OptionType::Put => "Put",
@@ -236,8 +252,16 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
             ("option-position", info, direction_class)
         }
         Position::Futures(futures) => {
-            let direction = if futures.quantity >= 0.0 { "Long" } else { "Short" };
-            let direction_class = if futures.quantity >= 0.0 { "long" } else { "short" };
+            let direction = if futures.quantity >= 0.0 {
+                "Long"
+            } else {
+                "Short"
+            };
+            let direction_class = if futures.quantity >= 0.0 {
+                "long"
+            } else {
+                "short"
+            };
             let info = format!(
                 "{} {} contracts @ ${:.2} (Size: {})",
                 direction,
@@ -253,10 +277,10 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
         div {
             class: "position-card {position_type_class}",
             class: if is_editing() { "editing" } else { "" },
-            
+
             div {
                 class: "position-card-header",
-                
+
                 div {
                     class: "position-toggle",
                     input {
@@ -272,7 +296,7 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
                         if position_clone.is_active() { "Active" } else { "Disabled" }
                     }
                 }
-                
+
                 div {
                     class: "position-type-badge",
                     "{props.position.position_type():?}"
@@ -306,18 +330,18 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
                     }
                 }
             }
-            
+
             div {
                 class: "position-card-body",
-                
+
                 if is_editing() {
                     // Edit mode form
                     div {
                         class: "position-edit-form",
-                        
+
                         div {
                             class: "form-row",
-                            label { 
+                            label {
                                 class: "form-label",
                                 "Direction:"
                             }
@@ -335,10 +359,10 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
                                 option { value: "Short", "Short" }
                             }
                         }
-                        
+
                         div {
                             class: "form-row",
-                            label { 
+                            label {
                                 class: "form-label",
                                 "Quantity:"
                             }
@@ -357,10 +381,10 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
                                 }
                             }
                         }
-                        
+
                         div {
                             class: "form-row",
-                            label { 
+                            label {
                                 class: "form-label",
                                 match &props.position {
                                     Position::Spot(_) => "Entry Price:",
@@ -381,12 +405,12 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
                                 }
                             }
                         }
-                        
+
                         // Strike price for options
                         if matches!(&props.position, Position::Option(_)) {
                             div {
                                 class: "form-row",
-                                label { 
+                                label {
                                     class: "form-label",
                                     "Strike Price:"
                                 }
@@ -404,10 +428,10 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
                                 }
                             }
                         }
-                        
+
                         div {
                             class: "form-row",
-                            label { 
+                            label {
                                 class: "form-label",
                                 "Description:"
                             }
@@ -424,7 +448,7 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
                     // View mode display with direction indicators
                     div {
                         class: "position-info",
-                        
+
                         // Parse direction from position_info and add styling
                         {
                             let (direction, rest) = if position_info.starts_with("Long") {
@@ -434,14 +458,14 @@ pub fn PositionCard(props: PositionCardProps) -> Element {
                             } else {
                                 ("", position_info.as_str())
                             };
-                            
+
                             rsx! {
                                 span { class: "position-direction {direction_class}", "{direction}" }
                                 span { "{rest}" }
                             }
                         }
                     }
-                    
+
                     if !props.position.description().is_empty() {
                         div {
                             class: "position-description",

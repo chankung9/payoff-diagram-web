@@ -1,9 +1,9 @@
 // Local storage management for Web3 data sovereignty
+use crate::models::{Portfolio, Position};
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::*;
 use web_sys::{window, Storage};
-use serde::{Serialize, Deserialize};
-use chrono::{DateTime, Utc};
-use crate::models::{Portfolio, Position};
 
 /// Local storage keys
 const PORTFOLIO_LIST_KEY: &str = "payoff_portfolios_v1";
@@ -63,7 +63,7 @@ impl LocalStorageManager {
     /// Save portfolio to local storage
     pub fn save_portfolio(portfolio: &Portfolio) -> Result<(), String> {
         let storage = Self::get_storage()?;
-        
+
         // Serialize portfolio
         let portfolio_json = serde_json::to_string(portfolio)
             .map_err(|e| format!("Failed to serialize portfolio: {}", e))?;
@@ -84,7 +84,9 @@ impl LocalStorageManager {
             }
         }
 
-        web_sys::console::log_1(&format!("Portfolio '{}' saved to local storage", portfolio.name).into());
+        web_sys::console::log_1(
+            &format!("Portfolio '{}' saved to local storage", portfolio.name).into(),
+        );
         Ok(())
     }
 
@@ -101,7 +103,9 @@ impl LocalStorageManager {
         let portfolio: Portfolio = serde_json::from_str(&portfolio_json)
             .map_err(|e| format!("Failed to deserialize portfolio: {}", e))?;
 
-        web_sys::console::log_1(&format!("Portfolio '{}' loaded from local storage", portfolio.name).into());
+        web_sys::console::log_1(
+            &format!("Portfolio '{}' loaded from local storage", portfolio.name).into(),
+        );
         Ok(portfolio)
     }
 
@@ -127,7 +131,9 @@ impl LocalStorageManager {
             }
         }
 
-        web_sys::console::log_1(&format!("Portfolio '{}' deleted from local storage", portfolio_id).into());
+        web_sys::console::log_1(
+            &format!("Portfolio '{}' deleted from local storage", portfolio_id).into(),
+        );
         Ok(())
     }
 
@@ -286,7 +292,7 @@ impl LocalStorageManager {
     pub fn get_storage_info() -> Result<StorageInfo, String> {
         let storage = Self::get_storage()?;
         let portfolios = Self::get_portfolio_list()?;
-        
+
         let mut total_size = 0;
         let mut portfolio_sizes = Vec::new();
 
@@ -333,30 +339,37 @@ impl LocalStorageManager {
     /// Migrate legacy data to new format
     pub fn migrate_legacy_data() -> Result<Option<Portfolio>, String> {
         let storage = Self::get_storage()?;
-        
+
         // Check for legacy position data
         const LEGACY_POSITIONS_KEY: &str = "payoff_positions";
-        
+
         if let Ok(Some(legacy_data)) = storage.get_item(LEGACY_POSITIONS_KEY) {
             web_sys::console::log_1(&"Found legacy position data, migrating...".into());
-            
+
             // Try to parse legacy positions
             if let Ok(positions) = serde_json::from_str::<Vec<Position>>(&legacy_data) {
                 // Convert to new portfolio format
-                let portfolio = crate::utils::BrowserFileManager::convert_positions_to_portfolio(positions)?;
-                
+                let portfolio =
+                    crate::utils::BrowserFileManager::convert_positions_to_portfolio(positions)?;
+
                 // Save as new portfolio
                 Self::save_portfolio(&portfolio)?;
                 Self::set_current_portfolio_id(&portfolio.id)?;
-                
+
                 // Remove legacy data
                 storage.remove_item(LEGACY_POSITIONS_KEY).ok();
-                
-                web_sys::console::log_1(&format!("Migrated {} positions to new portfolio format", portfolio.positions.len()).into());
+
+                web_sys::console::log_1(
+                    &format!(
+                        "Migrated {} positions to new portfolio format",
+                        portfolio.positions.len()
+                    )
+                    .into(),
+                );
                 return Ok(Some(portfolio));
             }
         }
-        
+
         Ok(None)
     }
 }
@@ -374,7 +387,7 @@ impl StorageInfo {
     pub fn total_size_mb(&self) -> f64 {
         self.total_size_bytes as f64 / (1024.0 * 1024.0)
     }
-    
+
     pub fn largest_portfolio(&self) -> Option<&(String, usize)> {
         self.portfolio_sizes.iter().max_by_key(|(_, size)| size)
     }

@@ -3,11 +3,13 @@ pub mod position;
 pub mod web3_data;
 
 // Re-export main types
-pub use position::{Position, PositionType, SpotPosition, OptionPosition, FuturesPosition, OptionType};
+pub use position::{
+    FuturesPosition, OptionPosition, OptionType, Position, PositionType, SpotPosition,
+};
 pub use web3_data::{
-    Portfolio, EnhancedPosition, PositionMetadata, PositionSource,
-    PortfolioSettings, ChartSettings, CalculationSettings, DisplaySettings, ExportSettings,
-    StorageMetadata, SyncMetadata, StorageProvider, BackupLocation, SyncConflict,
-    PositionTemplate, ExternalDataSource, DataExchangeFormat,
-    ChartType, ChartTheme, LegendPosition, PositionOrder, ExportFormat, ConflictType
+    BackupLocation, CalculationSettings, ChartSettings, ChartTheme, ChartType, ConflictType,
+    DataExchangeFormat, DisplaySettings, EnhancedPosition, ExportFormat, ExportSettings,
+    ExternalDataSource, LegendPosition, Portfolio, PortfolioSettings, PositionMetadata,
+    PositionOrder, PositionSource, PositionTemplate, StorageMetadata, StorageProvider,
+    SyncConflict, SyncMetadata,
 };

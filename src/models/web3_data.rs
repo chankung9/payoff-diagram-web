@@ -2,26 +2,26 @@
 // This file defines the comprehensive data model for Web3 data sovereignty
 // Supporting multiple storage providers, sync, and full user control
 
-use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Utc};
 use crate::models::Position;
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 
 // === Portfolio Level (Top-level Container) ===
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Portfolio {
     // Metadata
-    pub id: String,                    // UUID v4
-    pub name: String,                  // User-defined name
-    pub description: Option<String>,   // Optional description
-    pub created_at: DateTime<Utc>,     // Creation timestamp
-    pub updated_at: DateTime<Utc>,     // Last modification
-    pub version: String,               // Schema version (e.g., "1.0.0")
-    
+    pub id: String,                  // UUID v4
+    pub name: String,                // User-defined name
+    pub description: Option<String>, // Optional description
+    pub created_at: DateTime<Utc>,   // Creation timestamp
+    pub updated_at: DateTime<Utc>,   // Last modification
+    pub version: String,             // Schema version (e.g., "1.0.0")
+
     // Core Data
     pub positions: Vec<EnhancedPosition>, // All positions with metadata
-    pub settings: PortfolioSettings,   // Chart/calculation settings
-    pub tags: Vec<String>,             // User-defined tags
-    
+    pub settings: PortfolioSettings,      // Chart/calculation settings
+    pub tags: Vec<String>,                // User-defined tags
+
     // Web3 Metadata
     pub storage_metadata: StorageMetadata,
     pub sync_metadata: SyncMetadata,
@@ -75,19 +75,19 @@ impl Portfolio {
 // === Enhanced Position Model ===
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EnhancedPosition {
-    pub id: String,                    // UUID for tracking
-    pub position: Position,            // Core position data
-    pub metadata: PositionMetadata,    // Additional metadata
+    pub id: String,                 // UUID for tracking
+    pub position: Position,         // Core position data
+    pub metadata: PositionMetadata, // Additional metadata
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PositionMetadata {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
-    pub source: PositionSource,        // How position was created
-    pub tags: Vec<String>,             // User-defined tags
-    pub notes: Option<String>,         // User notes
-    pub external_id: Option<String>,   // Binance position ID, etc.
+    pub source: PositionSource,      // How position was created
+    pub tags: Vec<String>,           // User-defined tags
+    pub notes: Option<String>,       // User notes
+    pub external_id: Option<String>, // Binance position ID, etc.
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -103,40 +103,40 @@ pub enum PositionSource {
 pub struct PortfolioSettings {
     // Chart Settings
     pub chart_settings: ChartSettings,
-    
+
     // Calculation Settings
     pub calculation_settings: CalculationSettings,
-    
+
     // Display Settings
     pub display_settings: DisplaySettings,
-    
+
     // Export Settings
     pub export_settings: ExportSettings,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ChartSettings {
-    pub price_range: Option<(f64, f64)>,  // Custom price range
-    pub step_size: Option<f64>,           // Chart resolution
-    pub chart_type: ChartType,            // SVG, Canvas, etc.
-    pub theme: ChartTheme,                // Light, Dark, etc.
-    pub legend_position: LegendPosition,  // Top-right, etc.
+    pub price_range: Option<(f64, f64)>, // Custom price range
+    pub step_size: Option<f64>,          // Chart resolution
+    pub chart_type: ChartType,           // SVG, Canvas, etc.
+    pub theme: ChartTheme,               // Light, Dark, etc.
+    pub legend_position: LegendPosition, // Top-right, etc.
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CalculationSettings {
-    pub auto_range: bool,                 // Auto-calculate price range
-    pub include_inactive: bool,           // Include disabled positions
-    pub precision: u8,                    // Decimal precision
-    pub currency: String,                 // USD, EUR, etc.
+    pub auto_range: bool,       // Auto-calculate price range
+    pub include_inactive: bool, // Include disabled positions
+    pub precision: u8,          // Decimal precision
+    pub currency: String,       // USD, EUR, etc.
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DisplaySettings {
-    pub position_order: PositionOrder,    // Sort order
-    pub show_descriptions: bool,          // Show position descriptions
-    pub compact_mode: bool,               // Compact UI mode
-    pub language: String,                 // UI language
+    pub position_order: PositionOrder, // Sort order
+    pub show_descriptions: bool,       // Show position descriptions
+    pub compact_mode: bool,            // Compact UI mode
+    pub language: String,              // UI language
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -151,7 +151,7 @@ pub struct ExportSettings {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct StorageMetadata {
     pub storage_provider: StorageProvider,
-    pub storage_location: Option<String>,  // File path, IPFS hash, etc.
+    pub storage_location: Option<String>, // File path, IPFS hash, etc.
     pub encryption_enabled: bool,
     pub backup_locations: Vec<BackupLocation>,
     pub compression_enabled: bool,
@@ -161,7 +161,7 @@ pub struct StorageMetadata {
 pub struct SyncMetadata {
     pub last_sync: Option<DateTime<Utc>>,
     pub sync_conflicts: Vec<SyncConflict>,
-    pub device_id: String,             // Unique device identifier
+    pub device_id: String, // Unique device identifier
     pub sync_enabled: bool,
     pub auto_sync_interval: Option<u64>, // Minutes
 }
@@ -169,11 +169,23 @@ pub struct SyncMetadata {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum StorageProvider {
     LocalStorage,
-    GoogleDrive { account_id: String },
-    IPFS { node_url: String },
-    Dropbox { account_id: String },
-    GitHub { repo: String, path: String },
-    Custom { provider_name: String, endpoint: String },
+    GoogleDrive {
+        account_id: String,
+    },
+    IPFS {
+        node_url: String,
+    },
+    Dropbox {
+        account_id: String,
+    },
+    GitHub {
+        repo: String,
+        path: String,
+    },
+    Custom {
+        provider_name: String,
+        endpoint: String,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -268,7 +280,7 @@ pub enum TemplateCategory {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TemplatePosition {
-    pub position_type: String,    // "Spot", "Option", "Futures"
+    pub position_type: String,         // "Spot", "Option", "Futures"
     pub parameters: serde_json::Value, // Flexible parameters
     pub description: String,
 }
@@ -296,7 +308,7 @@ pub enum ExternalSourceType {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EncryptedCredentials {
-    pub encrypted_data: String,  // AES-256 encrypted credentials
+    pub encrypted_data: String, // AES-256 encrypted credentials
     pub salt: String,           // For key derivation
     pub iv: String,             // Initialization vector
 }
@@ -307,14 +319,14 @@ pub struct DataExchangeFormat {
     // Format metadata
     pub format_version: String,
     pub exported_at: DateTime<Utc>,
-    pub exported_by: String,        // Device/app identifier
-    pub checksum: Option<String>,   // Data integrity check
-    
+    pub exported_by: String,      // Device/app identifier
+    pub checksum: Option<String>, // Data integrity check
+
     // Core data
     pub portfolios: Vec<Portfolio>,
     pub templates: Vec<PositionTemplate>,
     pub external_sources: Vec<ExternalDataSource>,
-    
+
     // Export settings
     pub includes_settings: bool,
     pub includes_metadata: bool,

@@ -1,5 +1,7 @@
+use crate::models::{
+    FuturesPosition, OptionPosition, OptionType, Position, PositionType, SpotPosition,
+};
 use dioxus::prelude::*;
-use crate::models::{Position, PositionType, SpotPosition, OptionPosition, FuturesPosition, OptionType};
 
 #[derive(Props, Clone, PartialEq)]
 pub struct PositionFormProps {
@@ -38,7 +40,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
 
     let mut handle_submit = move |_| {
         error_message.set(String::new());
-        
+
         // Parse and validate inputs
         let base_qty = match quantity().parse::<f64>() {
             Ok(q) if q > 0.0 => q,
@@ -63,7 +65,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                         return;
                     }
                 };
-                
+
                 Position::Spot(SpotPosition::new(qty, price, Some(description())))
             }
             PositionType::Option => {
@@ -74,7 +76,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                         return;
                     }
                 };
-                
+
                 let prem = match premium().parse::<f64>() {
                     Ok(p) if p >= 0.0 => p,
                     _ => {
@@ -82,13 +84,13 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                         return;
                     }
                 };
-                
+
                 Position::Option(OptionPosition::new(
                     option_type(),
                     qty,
                     strike,
                     prem,
-                    Some(description())
+                    Some(description()),
                 ))
             }
             PositionType::Futures => {
@@ -99,7 +101,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                         return;
                     }
                 };
-                
+
                 let size = match contract_size().parse::<f64>() {
                     Ok(s) if s > 0.0 => s,
                     _ => {
@@ -107,7 +109,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                         return;
                     }
                 };
-                
+
                 Position::Futures(FuturesPosition::new(qty, price, size, Some(description())))
             }
         };
@@ -120,22 +122,22 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
         div {
             class: "position-form",
             h3 { "Add Position" }
-            
+
             if !error_message().is_empty() {
                 div {
                     class: "error-message",
                     "{error_message()}"
                 }
             }
-            
+
             form {
                 onsubmit: move |e| {
                     handle_submit(e);
                 },
-                
+
                 div {
                     class: "form-row",
-                    
+
                     div {
                         class: "form-group",
                         label { r#for: "position-type", "Position Type" }
@@ -156,7 +158,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                             option { value: "Futures", "Futures" }
                         }
                     }
-                    
+
                     div {
                         class: "form-group",
                         label { r#for: "position-direction", "Direction" }
@@ -175,7 +177,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                             option { value: "Short", "Short" }
                         }
                     }
-                    
+
                     div {
                         class: "form-group",
                         label { r#for: "quantity", "Quantity" }
@@ -191,7 +193,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                         }
                     }
                 }
-                
+
                 // Conditional fields based on position type
                 match position_type() {
                     PositionType::Spot => rsx! {
@@ -233,7 +235,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                                     option { value: "Put", "Put" }
                                 }
                             }
-                            
+
                             div {
                                 class: "form-group",
                                 label { r#for: "strike-price", "Strike Price" }
@@ -247,7 +249,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                                     oninput: move |e| strike_price.set(e.value())
                                 }
                             }
-                            
+
                             div {
                                 class: "form-group",
                                 label { r#for: "premium", "Premium" }
@@ -279,7 +281,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                                     oninput: move |e| entry_price.set(e.value())
                                 }
                             }
-                            
+
                             div {
                                 class: "form-group",
                                 label { r#for: "contract-size", "Contract Size" }
@@ -296,7 +298,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                         }
                     }
                 }
-                
+
                 div {
                     class: "form-group",
                     label { r#for: "description", "Description (Optional)" }
@@ -309,7 +311,7 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
                         oninput: move |e| description.set(e.value())
                     }
                 }
-                
+
                 div {
                     class: "form-actions",
                     button {

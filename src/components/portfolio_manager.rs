@@ -1,7 +1,7 @@
 // Simple Portfolio management UI component
+use crate::models::{ExportFormat, Portfolio};
+use crate::utils::{BrowserFileManager, LocalStorageManager, PortfolioListItem, StorageInfo};
 use dioxus::prelude::*;
-use crate::models::{Portfolio, ExportFormat};
-use crate::utils::{LocalStorageManager, PortfolioListItem, BrowserFileManager, StorageInfo};
 
 #[derive(Props, Clone, PartialEq)]
 pub struct PortfolioManagerProps {
@@ -32,13 +32,14 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
                             if let Ok(updated_list) = LocalStorageManager::get_portfolio_list() {
                                 portfolio_list.set(updated_list);
                             }
-                        },
-                        Err(e) => error_message.set(Some(format!("Error creating default portfolio: {}", e))),
+                        }
+                        Err(e) => error_message
+                            .set(Some(format!("Error creating default portfolio: {}", e))),
                     }
                 } else {
                     portfolio_list.set(list);
                 }
-            },
+            }
             Err(e) => error_message.set(Some(format!("Error loading portfolios: {}", e))),
         }
     });
@@ -50,34 +51,34 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
                 props.on_portfolio_change.call(new_portfolio);
                 show_create_form.set(false);
                 success_message.set(Some("Portfolio created successfully".to_string()));
-                
+
                 // Refresh list
                 if let Ok(list) = LocalStorageManager::get_portfolio_list() {
                     portfolio_list.set(list);
                 }
-            },
+            }
             Err(e) => error_message.set(Some(format!("Error creating portfolio: {}", e))),
         }
     };
 
-    let load_portfolio = move |id: String| {
-        match LocalStorageManager::load_portfolio(&id) {
-            Ok(portfolio) => {
-                props.on_portfolio_change.call(portfolio);
-                success_message.set(Some("Portfolio loaded successfully".to_string()));
-            },
-            Err(e) => error_message.set(Some(format!("Error loading portfolio: {}", e))),
+    let load_portfolio = move |id: String| match LocalStorageManager::load_portfolio(&id) {
+        Ok(portfolio) => {
+            props.on_portfolio_change.call(portfolio);
+            success_message.set(Some("Portfolio loaded successfully".to_string()));
         }
+        Err(e) => error_message.set(Some(format!("Error loading portfolio: {}", e))),
     };
 
     let export_portfolio = move |(id, format): (String, ExportFormat)| {
         match LocalStorageManager::load_portfolio(&id) {
             Ok(portfolio) => {
                 match BrowserFileManager::export_portfolio_to_file(&portfolio, format) {
-                    Ok(_) => success_message.set(Some("Portfolio exported successfully".to_string())),
+                    Ok(_) => {
+                        success_message.set(Some("Portfolio exported successfully".to_string()))
+                    }
                     Err(e) => error_message.set(Some(format!("Export error: {}", e))),
                 }
-            },
+            }
             Err(e) => error_message.set(Some(format!("Error loading portfolio for export: {}", e))),
         }
     };
@@ -86,7 +87,7 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
         match LocalStorageManager::delete_portfolio(&id) {
             Ok(_) => {
                 success_message.set(Some("Portfolio deleted successfully".to_string()));
-                
+
                 // Check if deleted portfolio was current และแก้ไขการ handle ด้วยการใช้ spawn
                 spawn(async move {
                     if let Some(current) = props.current_portfolio.read().as_ref() {
@@ -95,19 +96,23 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
                         }
                     }
                 });
-                
+
                 // Refresh list
                 if let Ok(list) = LocalStorageManager::get_portfolio_list() {
                     portfolio_list.set(list);
                 }
-            },
+            }
             Err(e) => error_message.set(Some(format!("Error deleting portfolio: {}", e))),
         }
     };
 
     // ใช้ use_memo เพื่อป้องกัน borrow conflict
     let current_portfolio_id = use_memo(move || {
-        props.current_portfolio.read().as_ref().map(|p| p.id.clone())
+        props
+            .current_portfolio
+            .read()
+            .as_ref()
+            .map(|p| p.id.clone())
     });
 
     rsx! {
@@ -125,7 +130,7 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
             // Messages
             {match success_message.read().as_ref() {
                 Some(msg) => rsx! {
-                    div { class: "message success", 
+                    div { class: "message success",
                         "{msg}"
                         button {
                             onclick: move |_| success_message.set(None),
@@ -138,7 +143,7 @@ pub fn PortfolioManager(props: PortfolioManagerProps) -> Element {
 
             {match error_message.read().as_ref() {
                 Some(msg) => rsx! {
-                    div { class: "message error", 
+                    div { class: "message error",
                         "{msg}"
                         button {
                             onclick: move |_| error_message.set(None),
@@ -256,14 +261,14 @@ struct PortfolioCardProps {
 #[component]
 fn PortfolioCard(props: PortfolioCardProps) -> Element {
     let mut show_export_formats = use_signal(|| false);
-    let card_class = if props.is_current { 
-        "portfolio-card current" 
-    } else { 
-        "portfolio-card" 
+    let card_class = if props.is_current {
+        "portfolio-card current"
+    } else {
+        "portfolio-card"
     };
 
     rsx! {
-        div { 
+        div {
             class: "{card_class}",
             onclick: {
                 let portfolio_id = props.portfolio_item.id.clone();
@@ -272,7 +277,7 @@ fn PortfolioCard(props: PortfolioCardProps) -> Element {
             },
 
             div { class: "portfolio-info",
-                h4 { 
+                h4 {
                     "{props.portfolio_item.name}"
                     {if props.is_current {
                         " (Current)"
@@ -281,10 +286,10 @@ fn PortfolioCard(props: PortfolioCardProps) -> Element {
                     }}
                 }
                 div { class: "portfolio-meta",
-                    span { class: "position-count", 
-                        "{props.portfolio_item.position_count} positions" 
+                    span { class: "position-count",
+                        "{props.portfolio_item.position_count} positions"
                     }
-                    span { class: "update-time", 
+                    span { class: "update-time",
                         {format!("Updated {}", props.portfolio_item.updated_at.format("%m/%d %H:%M"))}
                     }
                 }
