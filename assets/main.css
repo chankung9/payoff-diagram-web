@@ -2,8 +2,6 @@
 .svg-chart-wrapper {
     width: 100%;
     height: auto;
-    min-height: 400px;
-    max-height: 600px;
     aspect-ratio: 2/1;
     display: flex;
     align-items: center;
@@ -58,16 +56,10 @@
 
 /* Responsive adjustments for charts */
 @media (max-width: 1200px) {
-    .svg-chart-wrapper {
-        min-height: 350px;
-        max-height: 500px;
-    }
 }
 
 @media (max-width: 768px) {
     .svg-chart-wrapper {
-        min-height: 300px;
-        max-height: 400px;
         aspect-ratio: 1.8/1;
     }
     
@@ -78,8 +70,6 @@
 
 @media (max-width: 480px) {
     .svg-chart-wrapper {
-        min-height: 250px;
-        max-height: 350px;
         aspect-ratio: 1.6/1;
     }
     
@@ -356,7 +346,7 @@
     }
     
     .position-form-side {
-        order: 1;
+        order: 2;
     }
 }
 
