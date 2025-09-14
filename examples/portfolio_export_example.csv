@@ -1,0 +1,7 @@
+ID,Type,Quantity,Entry_Price,Strike_Price,Premium,Contract_Size,Description,Active,Created_At,Tags
+pos_001_long_call,Option,1.0,155.0,150.0,5.50,,"Long 1 AAPL Call @ Strike 150 Premium 5.50",true,2025-09-14 08:15:00,"bullish;moderate-risk"
+pos_002_short_call,Option,-1.0,155.0,160.0,2.25,,"Short 1 AAPL Call @ Strike 160 Premium 2.25",true,2025-09-14 08:16:00,"bearish-protection;income"
+pos_003_long_put,Option,1.0,155.0,140.0,3.75,,"Long 1 AAPL Put @ Strike 140 Premium 3.75",true,2025-09-14 08:17:00,"downside-protection"
+pos_004_short_put,Option,-1.0,155.0,145.0,4.80,,"Short 1 AAPL Put @ Strike 145 Premium 4.80",true,2025-09-14 08:18:00,"income;cash-secured"
+pos_005_spot_hedge,Spot,100.0,152.50,,,,"Long 100 AAPL shares @ 152.50",false,2025-09-14 09:00:00,"hedge;long-term"
+pos_006_futures_long,Futures,2.0,3850.0,,,,50.0,"Long 2 ES Futures @ 3850 (Size: 50)",true,2025-09-14 09:30:00,"bullish;leverage"

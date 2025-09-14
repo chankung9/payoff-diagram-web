@@ -1,0 +1,269 @@
+{
+  "format_version": "1.0.0",
+  "exported_at": "2025-09-14T10:30:45.123Z",
+  "exported_by": "payoff-diagram-web-0.1.0",
+  "checksum": "sha256:a1b2c3d4e5f6...",
+  "includes_settings": true,
+  "includes_metadata": true,
+  "encryption_used": false,
+  "portfolios": [
+    {
+      "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "name": "My Options Strategy Portfolio",
+      "description": "Iron Condor and Covered Call strategies for AAPL",
+      "created_at": "2025-09-14T08:00:00.000Z",
+      "updated_at": "2025-09-14T10:30:45.123Z",
+      "version": "1.0.0",
+      "tags": ["options", "conservative", "income"],
+      "positions": [
+        {
+          "id": "pos_001_long_call",
+          "position": {
+            "Option": {
+              "option_type": "Call",
+              "quantity": 1.0,
+              "strike_price": 150.0,
+              "premium": 5.50,
+              "expiry_price": 155.0,
+              "description": "Long 1 AAPL Call @ Strike 150 Premium 5.50",
+              "active": true
+            }
+          },
+          "metadata": {
+            "created_at": "2025-09-14T08:15:00.000Z",
+            "updated_at": "2025-09-14T09:45:00.000Z",
+            "source": {
+              "BinanceAPI": {
+                "account_id": "user@example.com"
+              }
+            },
+            "tags": ["bullish", "moderate-risk"],
+            "notes": "Part of iron condor strategy - expecting moderate upward movement",
+            "external_id": "AAPL_CALL_150_20250920"
+          }
+        },
+        {
+          "id": "pos_002_short_call",
+          "position": {
+            "Option": {
+              "option_type": "Call",
+              "quantity": -1.0,
+              "strike_price": 160.0,
+              "premium": 2.25,
+              "expiry_price": 155.0,
+              "description": "Short 1 AAPL Call @ Strike 160 Premium 2.25",
+              "active": true
+            }
+          },
+          "metadata": {
+            "created_at": "2025-09-14T08:16:00.000Z",
+            "updated_at": "2025-09-14T08:16:00.000Z",
+            "source": "Manual",
+            "tags": ["bearish-protection", "income"],
+            "notes": "Upper leg of iron condor - collecting premium",
+            "external_id": null
+          }
+        },
+        {
+          "id": "pos_003_long_put",
+          "position": {
+            "Option": {
+              "option_type": "Put",
+              "quantity": 1.0,
+              "strike_price": 140.0,
+              "premium": 3.75,
+              "expiry_price": 155.0,
+              "description": "Long 1 AAPL Put @ Strike 140 Premium 3.75",
+              "active": true
+            }
+          },
+          "metadata": {
+            "created_at": "2025-09-14T08:17:00.000Z",
+            "updated_at": "2025-09-14T08:17:00.000Z",
+            "source": {
+              "Template": {
+                "template_id": "iron_condor_conservative"
+              }
+            },
+            "tags": ["downside-protection"],
+            "notes": "Lower protection leg of iron condor",
+            "external_id": null
+          }
+        },
+        {
+          "id": "pos_004_short_put",
+          "position": {
+            "Option": {
+              "option_type": "Put",
+              "quantity": -1.0,
+              "strike_price": 145.0,
+              "premium": 4.80,
+              "expiry_price": 155.0,
+              "description": "Short 1 AAPL Put @ Strike 145 Premium 4.80",
+              "active": true
+            }
+          },
+          "metadata": {
+            "created_at": "2025-09-14T08:18:00.000Z",
+            "updated_at": "2025-09-14T08:18:00.000Z",
+            "source": "Manual",
+            "tags": ["income", "cash-secured"],
+            "notes": "Lower income leg - willing to own at 145",
+            "external_id": null
+          }
+        },
+        {
+          "id": "pos_005_spot_hedge",
+          "position": {
+            "Spot": {
+              "quantity": 100.0,
+              "entry_price": 152.50,
+              "description": "Long 100 AAPL shares @ 152.50",
+              "active": false
+            }
+          },
+          "metadata": {
+            "created_at": "2025-09-14T09:00:00.000Z",
+            "updated_at": "2025-09-14T10:30:00.000Z",
+            "source": {
+              "CSVImport": {
+                "filename": "portfolio_import_20250914.csv"
+              }
+            },
+            "tags": ["hedge", "long-term"],
+            "notes": "Disabled for now - analyzing options-only strategy",
+            "external_id": "AAPL_SPOT_001"
+          }
+        }
+      ],
+      "settings": {
+        "chart_settings": {
+          "price_range": [130.0, 170.0],
+          "step_size": 1.0,
+          "chart_type": "SVG",
+          "theme": "Auto",
+          "legend_position": "TopRight"
+        },
+        "calculation_settings": {
+          "auto_range": false,
+          "include_inactive": false,
+          "precision": 2,
+          "currency": "USD"
+        },
+        "display_settings": {
+          "position_order": "CreatedDate",
+          "show_descriptions": true,
+          "compact_mode": false,
+          "language": "en"
+        },
+        "export_settings": {
+          "default_format": "JSON",
+          "include_metadata": true,
+          "include_settings": true,
+          "encryption_enabled": false
+        }
+      },
+      "storage_metadata": {
+        "storage_provider": {
+          "GoogleDrive": {
+            "account_id": "trader@example.com"
+          }
+        },
+        "storage_location": "/PayoffDiagrams/MyPortfolios/options_strategy_001.json",
+        "encryption_enabled": false,
+        "compression_enabled": true,
+        "backup_locations": [
+          {
+            "provider": "LocalStorage",
+            "location": "local_backup_options_001",
+            "last_backup": "2025-09-14T10:25:00.000Z",
+            "active": true
+          },
+          {
+            "provider": {
+              "IPFS": {
+                "node_url": "https://ipfs.io"
+              }
+            },
+            "location": "QmX4k7W9Z8vN3mR2pL5qF6tE8cB1dA9sG7hJ3nM5kP2oQ",
+            "last_backup": "2025-09-14T10:20:00.000Z",
+            "active": true
+          }
+        ]
+      },
+      "sync_metadata": {
+        "last_sync": "2025-09-14T10:30:00.000Z",
+        "sync_conflicts": [],
+        "device_id": "desktop_chrome_main",
+        "sync_enabled": true,
+        "auto_sync_interval": 30
+      }
+    }
+  ],
+  "templates": [
+    {
+      "id": "iron_condor_conservative",
+      "name": "Conservative Iron Condor",
+      "description": "Low-risk iron condor with wide strikes",
+      "category": "Options",
+      "created_at": "2025-09-10T12:00:00.000Z",
+      "tags": ["neutral", "income", "conservative"],
+      "positions": [
+        {
+          "position_type": "Option",
+          "parameters": {
+            "option_type": "Call",
+            "quantity": 1.0,
+            "strike_offset": 0.0,
+            "premium_percentage": 0.03
+          },
+          "description": "Long call at current price"
+        },
+        {
+          "position_type": "Option", 
+          "parameters": {
+            "option_type": "Call",
+            "quantity": -1.0,
+            "strike_offset": 10.0,
+            "premium_percentage": 0.015
+          },
+          "description": "Short call 10 points higher"
+        },
+        {
+          "position_type": "Option",
+          "parameters": {
+            "option_type": "Put",
+            "quantity": 1.0,
+            "strike_offset": -10.0,
+            "premium_percentage": 0.025
+          },
+          "description": "Long put 10 points lower"
+        },
+        {
+          "position_type": "Option",
+          "parameters": {
+            "option_type": "Put",
+            "quantity": -1.0,
+            "strike_offset": -5.0,
+            "premium_percentage": 0.035
+          },
+          "description": "Short put 5 points lower"
+        }
+      ]
+    }
+  ],
+  "external_sources": [
+    {
+      "id": "binance_spot_main",
+      "name": "Binance Spot Account",
+      "source_type": "BinanceSpot",
+      "credentials": {
+        "encrypted_data": "AES256_ENCRYPTED_API_KEYS",
+        "salt": "random_salt_string",
+        "iv": "initialization_vector"
+      },
+      "last_sync": "2025-09-14T10:00:00.000Z",
+      "enabled": true
+    }
+  ]
+}
