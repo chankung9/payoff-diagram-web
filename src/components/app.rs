@@ -1,4 +1,4 @@
-use crate::components::{ChartControls, PayoffChart, PortfolioManager, PositionForm, PositionList, ApiTester};
+use crate::components::{ChartControls, PayoffChart, PortfolioManager, PositionForm, PositionList, ApiTester, ApiKeyManager};
 use crate::models::{Portfolio, Position};
 use crate::utils::{AppSettings, LocalStorageManager};
 use dioxus::prelude::*;
@@ -7,6 +7,7 @@ pub fn App() -> Element {
     // Portfolio management state
     let mut current_portfolio = use_signal(|| None::<Portfolio>);
     let mut show_portfolio_manager = use_signal(|| false);
+    let mut show_api_key_manager = use_signal(|| false);
     let mut app_settings = use_signal(|| AppSettings::default());
 
     // Chart state (derived from current portfolio)
@@ -182,23 +183,6 @@ pub fn App() -> Element {
         div {
             class: "app-container",
 
-            // Portfolio Manager Dialog
-            if show_portfolio_manager() {
-                PortfolioManager {
-                    current_portfolio: current_portfolio,
-                    on_portfolio_change: handle_portfolio_selected,
-                    on_delete_portfolio: {
-                        let mut current_portfolio = current_portfolio;
-                        move |_| {
-                            spawn(async move {
-                                current_portfolio.set(None);
-                            });
-                        }
-                    },
-                    on_close: handle_portfolio_manager_close
-                }
-            }
-
             header {
                 class: "app-header",
                 div {
@@ -213,10 +197,18 @@ pub fn App() -> Element {
                         div {
                             class: "current-portfolio-info",
                             span { class: "portfolio-name", "{portfolio.name}" }
-                            button {
-                                class: "btn btn-outline",
-                                onclick: move |_| show_portfolio_manager.set(true),
-                                "Switch Portfolio"
+                            div {
+                                class: "header-buttons",
+                                button {
+                                    class: "btn btn-outline",
+                                    onclick: move |_| show_portfolio_manager.set(true),
+                                    "Switch Portfolio"
+                                }
+                                button {
+                                    class: "btn btn-outline btn-secondary",
+                                    onclick: move |_| show_api_key_manager.set(true),
+                                    "🔑 API Keys"
+                                }
                             }
                         }
                     } else {
@@ -253,7 +245,10 @@ pub fn App() -> Element {
                     div {
                         class: "section position-form-side mobile-order-2",
                         PositionForm {
-                            on_add_position: add_position
+                            on_add_position: add_position,
+                            on_import_positions: move |_| {
+                                show_api_key_manager.set(true);
+                            }
                         }
                     }
                 }
@@ -391,6 +386,39 @@ pub fn App() -> Element {
             footer {
                 class: "app-footer",
                 p { "Built with Rust + Dioxus + WebAssembly | © 2025 Payoff Diagram Web" }
+            }
+        }
+
+        // Portfolio Manager Modal
+        if show_portfolio_manager() {
+            PortfolioManager {
+                current_portfolio: current_portfolio,
+                on_portfolio_change: handle_portfolio_selected,
+                on_delete_portfolio: {
+                    let mut current_portfolio = current_portfolio;
+                    move |_| {
+                        spawn(async move {
+                            current_portfolio.set(None);
+                        });
+                    }
+                },
+                on_close: handle_portfolio_manager_close
+            }
+        }
+
+        // API Key Manager Modal
+        if show_api_key_manager() {
+            div {
+                class: "modal-overlay",
+                onclick: move |_| show_api_key_manager.set(false),
+                div {
+                    class: "modal-content",
+                    onclick: move |e| e.stop_propagation(),
+                    ApiKeyManager {
+                        on_close: move |_| show_api_key_manager.set(false),
+                        current_portfolio: current_portfolio
+                    }
+                }
             }
         }
     }

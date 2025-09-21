@@ -1,4 +1,5 @@
 use axum::{
+    extract::Query,
     http::StatusCode,
     response::Json,
     routing::{get, post},
@@ -11,9 +12,7 @@ use tower_http::cors::{Any, CorsLayer};
 struct BinanceRequest {
     api_key: String,
     secret_key: String,
-    endpoint: Option<String>,    // Made optional since each handler knows its endpoint
     symbol: Option<String>,      // Client สามารถระบุ symbol ได้
-    params: Option<serde_json::Value>, // พารามิเตอร์เพิ่มเติม
 }
 
 #[derive(Debug, Serialize)]
@@ -38,6 +37,7 @@ async fn main() {
         .route("/api/binance/orders", post(get_orders))
         .route("/api/binance/options/positions", post(get_options_positions))
         .route("/api/binance/futures/positions", post(get_futures_positions))
+        .route("/api/binance/ticker/price", get(get_ticker_price))
         .layer(cors);
 
     let listener = tokio::net::TcpListener::bind("127.0.0.1:3001")
@@ -115,6 +115,15 @@ async fn get_futures_positions(Json(payload): Json<BinanceRequest>) -> Result<Js
             data: None,
             error: Some(e),
         })),
+    }
+}
+
+async fn get_ticker_price(Query(params): Query<std::collections::HashMap<String, String>>) -> Result<Json<serde_json::Value>, StatusCode> {
+    let symbol = params.get("symbol").ok_or(StatusCode::BAD_REQUEST)?;
+    
+    match fetch_ticker_price(symbol).await {
+        Ok(data) => Ok(Json(data)),
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
 
@@ -248,6 +257,31 @@ async fn fetch_futures_data(
     if !status.is_success() {
         let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
         return Err(format!("Binance Futures API Error ({}): {}", status, error_text));
+    }
+
+    let data: serde_json::Value = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse response: {}", e))?;
+
+    Ok(data)
+}
+
+// ฟังก์ชั่นสำหรับ Ticker Price (Public API - ไม่ต้องใช้ signature)
+async fn fetch_ticker_price(symbol: &str) -> Result<serde_json::Value, String> {
+    let url = format!("https://api.binance.com/api/v3/ticker/price?symbol={}", symbol);
+
+    let client = reqwest::Client::new();
+    let response = client
+        .get(&url)
+        .send()
+        .await
+        .map_err(|e| format!("Network error: {}", e))?;
+
+    let status = response.status();
+    if !status.is_success() {
+        let error_text = response.text().await.unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("Binance API Error ({}): {}", status, error_text));
     }
 
     let data: serde_json::Value = response

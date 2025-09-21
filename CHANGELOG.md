@@ -2,7 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased] - 2025-09-14
+## [0.2.0] - 2025-09-22
+
+### 🚀 Major Features Added
+- **Real Binance API Integration**: Full integration with Binance Spot, Futures, and Options APIs
+- **Position Import System**: One-click import of live trading positions from Binance
+- **Proxy Server**: Secure Rust/Axum server for API key management and request handling
+- **Trading Pair Selection**: Focus on Solana ecosystem with SOL/USDT, SOL/USDC, SOL/BUSD, SOL/BTC, SOL/ETH support
+- **Multi-Market Support**: Import positions from Spot, Futures (positionRisk), and Options APIs
+- **API Key Manager**: Secure storage and management of exchange API credentials
+
+### ✨ Enhanced Features
+- **Real-time Position Data**: Import actual entry prices, quantities, and unrealized P&L
+- **Mixed Trading Analysis**: Combine imported positions with manual entries
+- **Enhanced Position Matching**: Smart symbol matching for trading pairs
+- **Current Market Prices**: Real-time ticker price integration
+- **Secure Authentication**: HMAC-SHA256 signature generation for API security
+
+### 🔧 Technical Improvements
+- **reqwest Integration**: Added HTTP client for API communication
+- **CORS Support**: Proper cross-origin request handling
+- **Error Handling**: Comprehensive error management for API failures
+- **Type Safety**: Proper Rust type definitions for API responses
+- **Clean Architecture**: Separation of concerns between frontend and proxy server
+
+### 🗂️ Code Cleanup
+- **Removed Dead Code**: Eliminated unused imports and temporary files
+- **Streamlined Dependencies**: Cleaned up unused proxy server fields
+- **Documentation**: Updated README with API integration instructions
+- **Project Structure**: Organized codebase for better maintainability
+
+## [0.1.0] - 2025-09-14
 
 ### Added
 - **Binance-Style Legend**: Long-press activation legend with professional dark theme

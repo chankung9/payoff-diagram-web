@@ -1,6 +1,6 @@
 [package]
 name = "payoff-diagram-web"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [[bin]]
@@ -48,6 +48,7 @@ web-sys = { version = "0.3", features = [
 ] }
 gloo-timers = { version = "0.3.0", features = ["futures"] }
 wasm-bindgen-futures = "0.4.51"
+reqwest = { version = "0.12.23", features = ["json"] }
 
 [features]
 default = ["web"]

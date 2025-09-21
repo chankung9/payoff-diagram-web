@@ -313,7 +313,36 @@ impl LocalStorageManager {
         })
     }
 
-    /// Clear all data (for reset functionality)
+    /// Save API keys to local storage
+    pub fn save_api_keys(api_keys: &[crate::models::api_keys::ApiKey]) -> Result<(), String> {
+        let storage = Self::get_storage()?;
+        
+        let api_keys_json = serde_json::to_string(api_keys)
+            .map_err(|e| format!("Failed to serialize API keys: {}", e))?;
+            
+        storage
+            .set_item("api_keys", &api_keys_json)
+            .map_err(|_| "Failed to save API keys to storage")?;
+            
+        Ok(())
+    }
+
+    /// Load API keys from local storage
+    pub fn load_api_keys() -> Result<Vec<crate::models::api_keys::ApiKey>, String> {
+        let storage = Self::get_storage()?;
+        
+        let api_keys_json = storage
+            .get_item("api_keys")
+            .map_err(|_| "Failed to access storage")?
+            .ok_or("No API keys found in storage")?;
+            
+        let api_keys = serde_json::from_str(&api_keys_json)
+            .map_err(|e| format!("Failed to parse API keys: {}", e))?;
+            
+        Ok(api_keys)
+    }
+
+    /// Clear all data from local storage
     pub fn clear_all_data() -> Result<(), String> {
         let storage = Self::get_storage()?;
         let portfolios = Self::get_portfolio_list()?;

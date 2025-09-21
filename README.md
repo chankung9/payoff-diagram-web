@@ -1,10 +1,26 @@
 # Payoff Diagram Web Application
 
-A web application for creating and visualizing payoff diagrams for various financial positions (Spot, Options, Futures) built with Rust, Dioxus, and WebAssembly.
+A web application for creating and visualizing payoff diagrams for various financial positions (Spot, Options, Futures) built with Rust, Dioxus, and WebAssembly. Now with **real Binance API integration** for importing live trading positions.
+
+## 🚀 Latest Features
+
+### Real API Integration
+- **Live Binance Integration**: Import real positions from Binance accounts
+- **Multi-Market Support**: Spot, Futures, and Options trading
+- **Trading Pair Selection**: Focus on Solana ecosystem (SOL/USDT, SOL/USDC, SOL/BUSD, SOL/BTC, SOL/ETH)
+- **Real-time Data**: Current market prices and position P&L
+- **Secure API Handling**: Proxy server for safe API key management
+
+### Enhanced Position Management
+- **One-Click Import**: Import positions directly from exchange APIs
+- **Position Filtering**: Select specific trading pairs to import
+- **Real Position Data**: Actual entry prices, quantities, and unrealized P&L
+- **Mixed Trading**: Combine imported and manual positions
 
 ## Features
 
 - **Position Input**: Add different types of financial positions (Spot, Call/Put Options, Futures)
+- **API Integration**: Import real positions from Binance with secure API handling
 - **Position Management**: Toggle positions on/off without deletion, inline editing capabilities
 - **Payoff Calculation**: Calculate profit/loss across price ranges with active position filtering
 - **Interactive Charts**: SVG-based interactive charts with hover effects and draggable legend
@@ -25,11 +41,28 @@ A web application for creating and visualizing payoff diagrams for various finan
 - **Frontend Framework**: Dioxus 0.6.3 (Rust)
 - **Compilation Target**: WebAssembly (WASM)
 - **Build System**: Dioxus CLI (`dx`)
+- **API Integration**: Binance REST APIs (Spot, Futures, Options)
+- **Proxy Server**: Axum-based Rust server for secure API handling
+- **HTTP Client**: reqwest for API communication
 - **Charts**: Interactive SVG charts with hover effects, draggable legends, and real-time data display
 - **State Management**: Reactive signals with use_signal
 - **Styling**: CSS3 with smooth transitions and responsive design
 - **Data Format**: JSON for export/import
-- **No Backend Required**: Pure client-side application
+- **Security**: HMAC-SHA256 authentication for Binance APIs
+
+## Architecture
+
+### Frontend (Dioxus WASM)
+- Reactive UI components
+- Real-time chart rendering
+- API key management
+- Position import workflow
+
+### Proxy Server (Rust/Axum)
+- Secure API key handling
+- Binance API integration
+- CORS support
+- Request/response proxying
 
 ## Quick Start
 
@@ -47,7 +80,26 @@ git clone https://github.com/chankung9/payoff-diagram-web.git
 cd payoff-diagram-web
 ```
 
-2. Install dependencies:
+2. Start the proxy server:
+```bash
+cd proxy-server
+cargo run
+```
+
+3. In a new terminal, start the frontend:
+```bash
+dx serve
+```
+
+4. Open your browser to `http://localhost:8080`
+
+### Using with Binance API
+
+1. **Create API Keys**: Generate Binance API keys with trading permissions
+2. **Add API Keys**: Use the API Key Manager in the app
+3. **Import Positions**: Click "Import Positions" in the position form
+4. **Select Pairs**: Choose Solana trading pairs to import
+5. **Analyze**: View imported positions in payoff diagrams
 ```bash
 cargo build
 ```

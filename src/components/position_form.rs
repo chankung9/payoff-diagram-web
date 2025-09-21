@@ -6,6 +6,8 @@ use dioxus::prelude::*;
 #[derive(Props, Clone, PartialEq)]
 pub struct PositionFormProps {
     pub on_add_position: EventHandler<Position>,
+    #[props(optional)]
+    pub on_import_positions: Option<EventHandler<()>>,
 }
 
 /// Position direction (Long or Short)
@@ -121,7 +123,23 @@ pub fn PositionForm(props: PositionFormProps) -> Element {
     rsx! {
         div {
             class: "position-form",
-            h3 { "Add Position" }
+            
+            div {
+                class: "form-header",
+                style: "display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;",
+                h3 { "Add Position" }
+                
+                // Import button if handler is provided
+                if let Some(import_handler) = props.on_import_positions {
+                    button {
+                        r#type: "button",
+                        class: "btn btn-outline-primary",
+                        style: "display: flex; align-items: center; gap: 8px;",
+                        onclick: move |_| import_handler.call(()),
+                        "📥 Import from Exchange"
+                    }
+                }
+            }
 
             if !error_message().is_empty() {
                 div {
