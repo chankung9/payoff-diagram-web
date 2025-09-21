@@ -1,4 +1,4 @@
-use crate::components::{ChartControls, PayoffChart, PortfolioManager, PositionForm, PositionList};
+use crate::components::{ChartControls, PayoffChart, PortfolioManager, PositionForm, PositionList, ApiTester};
 use crate::models::{Portfolio, Position};
 use crate::utils::{AppSettings, LocalStorageManager};
 use dioxus::prelude::*;
@@ -378,6 +378,13 @@ pub fn App() -> Element {
                             "Get Started"
                         }
                     }
+                }
+
+                // Temporary API Tester (for development)
+                div {
+                    style: "margin-top: 2rem; padding: 1rem; border: 2px dashed #e74c3c; border-radius: 8px;",
+                    h3 { style: "color: #e74c3c; margin-bottom: 1rem;", "🧪 Development: API Tester" }
+                    ApiTester {}
                 }
             }
 

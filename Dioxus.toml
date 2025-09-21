@@ -5,3 +5,15 @@ title = "Payoff Diagram Web"
 
 [web.resource.dev]
 script = []
+
+[web.watcher]
+reload_html = true
+watch_path = ["src", "assets"]
+
+[web.resource]
+style = []
+script = []
+
+# WASM configuration to fix initialization issues
+[web.wasm]
+reference = "assets"
